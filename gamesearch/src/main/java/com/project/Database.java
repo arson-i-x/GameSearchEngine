@@ -8,9 +8,9 @@ public class Database {
     
     List<CSVRecord> RecordList;
     List<Game> GameList;
-    HashMap<String, Game> NameTable;
+    HashMap<Integer, Game> NameTable;
 
-    final static int MAXIMUM_GAMELIST_SIZE = 1000; // LIMIT DATABASE SIZE TO 100 GAMES FOR NOW
+    final static int MAXIMUM_GAMELIST_SIZE = 2000; // LIMIT DATABASE SIZE TO 100 GAMES FOR NOW
 
     
 
@@ -19,9 +19,9 @@ public class Database {
     {
         this.RecordList = ParseCSV();
         this.GameList = this.DatabasetoGamelist(); 
-        this.NameTable = new HashMap<String, Game>();
+        this.NameTable = new HashMap<Integer, Game>();
         for (Game G : this.GameList) {
-            this.NameTable.put(G.name, G);
+            this.NameTable.put(G.gameID, G);
         }
     }
 
@@ -29,22 +29,45 @@ public class Database {
     {
         this.RecordList = ParseCSV(path);
         this.GameList = this.DatabasetoGamelist(); 
-        this.NameTable = new HashMap<String, Game>();
+        this.NameTable = new HashMap<Integer, Game>();
         for (Game G : this.GameList) {
-            this.NameTable.put(G.name, G);
+            this.NameTable.put(G.gameID, G);
         }
     }
 
     // Query Database with name of game and return Game Object
-    public Game Query(String GameName) 
+    public Game Query(int gameID) 
     {
         // if done searching return an empty game object
-        if (GameName.equals("DONE")) {
+        if (gameID == -1) {
             return new Game(null);
         }
+        /*
+        if (GameName.length() < 4) {
+            return this.NameTable.get(GameName);
+        }
 
-        // otherwise return null
-        return this.NameTable.get(GameName);
+        // stores lowercase and uppercase version of user input
+        String UpperName = GameName.toUpperCase();
+        String LowerName = GameName.toLowerCase();
+        String correctedName = GameName;
+        int bestRatio = 0;
+
+        // compare user input to names in table and return best match
+        for (String Name : this.NameTable.keySet()) {
+            int upperRatio = FuzzySearch.partialRatio(Name.toUpperCase(), UpperName);
+            int lowerRatio = FuzzySearch.partialRatio(Name.toLowerCase(), LowerName);
+            if (upperRatio > bestRatio && upperRatio > 90 && upperRatio > lowerRatio) {
+                bestRatio = upperRatio;
+                correctedName = Name;
+            } else if (lowerRatio > bestRatio && lowerRatio > 90) {
+                bestRatio = lowerRatio;
+                correctedName = Name;
+            }
+        }
+        String GameNameNew = correctedName;
+        */
+        return this.NameTable.get(gameID);
     }
 
     // method to convert Database to list of Game objects

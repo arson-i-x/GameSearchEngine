@@ -62,9 +62,4 @@ public class UserData {
         return GamesList;
     }
 
-    // stores a matched game in UserData for use as SourceVertex
-    public void matchGame (Game GameToMatch) 
-    {
-        
-    }
 }

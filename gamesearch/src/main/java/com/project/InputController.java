@@ -22,9 +22,13 @@ public class InputController {
 
     public static Game UserQuery (Database database, Scanner scanner) 
     {
-        System.out.println("Enter name of game");
-        String GameName = scanner.nextLine();  // Read user input
-        Game Game = database.Query(GameName);
+
+        // STD IN
+        System.out.println("Enter ID of game or -1 if finished");
+        String GameID = scanner.nextLine();  // Read user input
+
+
+        Game Game = database.Query(Integer.parseInt(GameID));
         return Game;
     }
 

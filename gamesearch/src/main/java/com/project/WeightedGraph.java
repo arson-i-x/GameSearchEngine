@@ -5,21 +5,27 @@ import java.util.*;
 
 public class WeightedGraph {
     
-    List<Game> AllGames;
+    // how many times user can say no
+    final int MAX_ITERATIONS = 3;
     
-    public WeightedGraph (Database gameData) // constructs weighted graph using Database as input
+    // stores all games in database
+    Database Database;
+    
+    // constructs weighted graph using Database as input
+    public WeightedGraph (Database gameData) 
     {
-        this.AllGames = gameData.GameList;
+        this.Database = gameData;
         this.addWeights();
     }
 
+    // adds edges to each game
     private void addWeights () 
     {
         // Could possibly find initial source during this step
         
         // THIS IS EXTREMELY SLOW AND WILL PROBABLY BE REIMPLEMENTED
-        for (Game Game1 : this.AllGames) {
-            for (Game Game2 : this.AllGames) {
+        for (Game Game1 : this.Database.GameList) {
+            for (Game Game2 : this.Database.GameList) {
                 if (Game1.gameID == Game2.gameID) { continue; }
                 int matches = 0;
                 for (String tag : Game1.tags) {
@@ -35,29 +41,23 @@ public class WeightedGraph {
     // search and present games. Scan from input and enter next control state according to input.
     public void Search (UserData UserData) 
     {
-        // how many times user can say no
-        final int MAX_ITERATIONS = 10;
-
-        // algorithm
+        // variables
         int iterations = 0;
         InputController UserInput;
         List<Game> S = new ArrayList<Game>();
         Game Source = this.ChooseSourceVertex(UserData);
         S.add(Source);
+        Game GameToPresent = Source;
 
+        // algorithm
         while (true)
         {
-            // Start with source and remove it
-            Game GameToPresent = Source.removed ? this.ChooseNext(S, Source) : Source;
-            if (GameToPresent == Source) {
-                Source.RemoveGame();
-            }
             // if no game found search again
             if (GameToPresent == null) {
                 break;
             }
 
-            // if user doesn't own this game return it
+            // if user doesn't own this game Output it and get user Input
             if (!UserData.UserGames.contains(GameToPresent.gameID)) { 
                 Scanner scanner = new Scanner(System.in);
                 UserInput = InputController.PresentGameToUser(GameToPresent, scanner, iterations);
@@ -74,13 +74,17 @@ public class WeightedGraph {
                     iterations++;
                 }
             }
+            
             // remove this game
             GameToPresent.RemoveGame();
-
-            // if user has said no to last 5 games break
+    
+            // if user has said no to last x games, break
             if (iterations > MAX_ITERATIONS) {
                 break;
             }
+
+            // choose next best game from source
+            GameToPresent =  this.ChooseNext(S, Source);
         }
 
         // find new source vertex
@@ -92,29 +96,25 @@ public class WeightedGraph {
     public Game ChooseSourceVertex (UserData UserData)
     {
         // if library or usertags is empty get a random game
-
         if (UserData.UserGames.isEmpty() || UserData.UserTags.isEmpty()) {
             Random rand = new Random();
-            return this.AllGames.get(rand.nextInt(this.AllGames.size()));
+            return this.Database.GameList.get(rand.nextInt(this.Database.GameList.size()));
         }
 
         // compare each game to UserTags and return one with most matches
         Game bestGame = null;
         int bestCount = 0;
-        for (Game G : this.AllGames) {
+        for (Game G : this.Database.GameList) {
             if (G.removed) { continue; } // prevents removed games from being source vertex
-            if (bestGame == null && UserData.UserGames.contains(G.gameID)) {
-                bestGame = G;
-            } 
             int count = 0;
             for (String tag : G.tags) {
                 if (UserData.UserTags.containsKey(tag)) {
                     count++;
-                    if (count > bestCount) {
-                        bestCount = count;
-                        bestGame = G;
-                        break;
-                    }
+                }
+                if (count > bestCount) {
+                    bestCount = count;
+                    bestGame = G;
+                    break;
                 }
             }
         }
@@ -135,16 +135,17 @@ public class WeightedGraph {
         return bestGame;
     }
 
+    // chooses next game with most amount of tag matches
     public Game ChooseNext (List<Game> S, Game Source) 
     {
         Game nextGame = null;
         int maxWeight = 0;
-        HashMap<Integer, Edge> SourceEdges = Source.GetEdges();
+        HashMap<Integer, Edge> SourceEdges = Source.edges;
 
         // for each Game in S
         for (Game G : S) {
             if (G.gameID == Source.gameID) { continue; }
-            HashMap<Integer, Edge> GEdges = G.GetEdges();
+            HashMap<Integer, Edge> GEdges = G.edges;
             
             // Check all its edges and update maxWeight 
             // with combined weight of this and source
@@ -173,17 +174,12 @@ public class WeightedGraph {
             }
         }
         if (nextGame == null) {
-            Source.RemoveGame();
-        }
-
-        try {
-            if (nextGame == null) {throw new NullPointerException();}
-        } catch (NullPointerException npe) {
-            GameSearchApplication.ExitProgram("NO GAME FOUND");
+            nextGame = Source.removed ? Source : null;
         }
         return nextGame;
     }
 
+    // tests unit
     public static void main (String[] args) 
     {
         Database database = new Database();

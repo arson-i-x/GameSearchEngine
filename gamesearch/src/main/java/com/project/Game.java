@@ -14,6 +14,7 @@ public class Game {
     // constructs a game object using a CSV record and index
     public Game (CSVRecord record) 
     {
+        // makes an empty game object
         if (record == null) {
             this.gameID = -1;
             return;
@@ -51,11 +52,6 @@ public class Game {
                 OtherGameEdges.get(this.gameID).Weight = 0;
             }
         }
-    }
-
-    public HashMap<Integer, Edge> GetEdges () 
-    {
-        return this.edges;
     }
 
     public int getHoursPlayed () 
