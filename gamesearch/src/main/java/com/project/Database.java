@@ -2,49 +2,40 @@ package com.project;
 import java.io.*;
 import java.util.*;
 import org.apache.commons.csv.*;
-import org.springframework.core.io.ClassPathResource;
+import me.xdrop.fuzzywuzzy.FuzzySearch;
 
 public class Database {
     
-    List<CSVRecord> RecordList;
-    List<Game> GameList;
-    HashMap<Integer, Game> NameTable;
+    static final int DATABASE_MAX = 1000;
+    static List<CSVRecord> RecordList;
+    HashMap<String, Game> GameTable;
 
-    final static int MAXIMUM_GAMELIST_SIZE = 2000; // LIMIT DATABASE SIZE TO 100 GAMES FOR NOW
+    //final static int MAXIMUM_GAMELIST_SIZE = 2000; // LIMIT DATABASE SIZE TO 100 GAMES FOR NOW
 
-    
-
-    // constructs a database from CSV file output
+    // constructs a database from default path
     public Database () 
     {
-        this.RecordList = ParseCSV();
-        this.GameList = this.DatabasetoGamelist(); 
-        this.NameTable = new HashMap<Integer, Game>();
-        for (Game G : this.GameList) {
-            this.NameTable.put(G.gameID, G);
-        }
+        RecordList = ParseCSV("gamesearch/src/main/resources/GameDataset.csv");
+        this.GameTable = toGameTable();
     }
 
+    // constructs database with specific path
     public Database (String path) 
     {
-        this.RecordList = ParseCSV(path);
-        this.GameList = this.DatabasetoGamelist(); 
-        this.NameTable = new HashMap<Integer, Game>();
-        for (Game G : this.GameList) {
-            this.NameTable.put(G.gameID, G);
-        }
+        RecordList = ParseCSV(path);
+        this.GameTable = toGameTable();
     }
 
     // Query Database with name of game and return Game Object
-    public Game Query(int gameID) 
+    public Game Query(String GameName) 
     {
         // if done searching return an empty game object
-        if (gameID == -1) {
+        if (GameName.equals("-1")) {
             return new Game(null);
         }
-        /*
+        /* Method to use Game name and get misspellings */
         if (GameName.length() < 4) {
-            return this.NameTable.get(GameName);
+            return this.GameTable.get(GameName);
         }
 
         // stores lowercase and uppercase version of user input
@@ -54,9 +45,9 @@ public class Database {
         int bestRatio = 0;
 
         // compare user input to names in table and return best match
-        for (String Name : this.NameTable.keySet()) {
-            int upperRatio = FuzzySearch.partialRatio(Name.toUpperCase(), UpperName);
-            int lowerRatio = FuzzySearch.partialRatio(Name.toLowerCase(), LowerName);
+        for (String Name : this.GameTable.keySet()) {
+            int upperRatio = FuzzySearch.ratio(Name.toUpperCase(), UpperName);
+            int lowerRatio = FuzzySearch.ratio(Name.toLowerCase(), LowerName);
             if (upperRatio > bestRatio && upperRatio > 90 && upperRatio > lowerRatio) {
                 bestRatio = upperRatio;
                 correctedName = Name;
@@ -65,45 +56,26 @@ public class Database {
                 correctedName = Name;
             }
         }
-        String GameNameNew = correctedName;
-        */
-        return this.NameTable.get(gameID);
+
+        return this.GameTable.get(correctedName);
     }
 
-    // method to convert Database to list of Game objects
-    private List<Game> DatabasetoGamelist () 
+    // method to convert Database records to list of Game objects
+    private HashMap<String, Game> toGameTable () 
     {
-        List<Game> AllGames = new ArrayList<Game>();
-        int index = 0;
+        HashMap<String, Game> AllGames = new LinkedHashMap<String, Game>();
         boolean first = true;
-        for (CSVRecord record : this.RecordList) {
+        int iterations = 0;
+        for (CSVRecord record : Database.RecordList) {
+            if (iterations > DATABASE_MAX) {
+                break;
+            }
             if (first) { first = false; continue; }
-            AllGames.add(new Game(record));
-            index++;
-            if (index == MAXIMUM_GAMELIST_SIZE) { break; }
+            Game newGame = new Game(record);
+            AllGames.put(newGame.name, newGame);
+            iterations++;
         }
         return AllGames;
-    }
-
-    // returns a list of records from CSV file
-    private static List<CSVRecord> ParseCSV () 
-    {
-        List<CSVRecord> RecordList = new ArrayList<CSVRecord>();
-
-        // try to parse database records
-        try {   
-            ClassPathResource resource = new ClassPathResource("gamesearch/src/main/resources/GameDataset.csv");
-            Reader in = new FileReader(resource.getPath()); 
-            Iterable<CSVRecord> records = CSVFormat.RFC4180.builder().setHeader("App ID","Title","Reviews Total","Reviews Score Fancy","Release Date","Reviews D7","Reviews D30","Reviews D90","Launch Price","Tags","name_slug","Revenue Estimated","Modified Tags","Steam Page").build().parse(in);
-            for (CSVRecord record : records) {
-                RecordList.add(record);
-            }
-        } catch (IOException exception) {
-            System.out.println("ERROR PARSING DATABASE");
-            exception.printStackTrace();
-        }
-
-        return RecordList;
     }
 
     // returns a list of records from CSV file using given string path
@@ -128,10 +100,24 @@ public class Database {
             return RecordList;
     }
 
+    // gets random game title from table
+    public Game GetRandomGame () 
+    {
+        Game randomGame = null;
+        Random rand = new Random();
+        int i = rand.nextInt(this.GameTable.size() - 1);
+        int iterations = 0;
+        for (Game game : this.GameTable.values()) {
+            if (iterations == i) {randomGame = game; break;}
+            iterations++;
+        }
+        return randomGame;
+    }
+
     // tests database structure. Use this to ensure filepath is set correctly
     public static void main (String[] args) 
     {
-        List<CSVRecord> newRecords = Database.ParseCSV();
+        List<CSVRecord> newRecords = Database.ParseCSV("gamesearch/src/main/resources/GameDataset.csv");
         int[] appids = new int[5];
         String[] names = new String[5];
         String[] tags = new String[5];

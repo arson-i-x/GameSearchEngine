@@ -9,6 +9,7 @@ public class Game {
     String URL;
     HashSet<String> tags;
     HashMap<Integer, Edge> edges;
+    boolean weighted;
     boolean removed;
     
     // constructs a game object using a CSV record and index
@@ -37,6 +38,7 @@ public class Game {
         this.price = record.get("Launch Price");
         this.edges = new HashMap<Integer, Edge>();
         this.removed = false;
+        this.weighted = false;
     }
 
     // sets a game as removed and gets rid of all edges
@@ -54,6 +56,7 @@ public class Game {
         }
     }
 
+    // uses steam api to get user hours played or return -1
     public int getHoursPlayed () 
     {
         int hoursPlayed = 1;
@@ -66,10 +69,10 @@ public class Game {
     {
         Game[] games = new Game[5];
         Database database = new Database();
-        List<Game> AllGames = database.GameList;
+        Collection<Game> AllGames = database.GameTable.values();
         int i = 0;
         int first = 1;
-        for (CSVRecord record : database.RecordList) {
+        for (CSVRecord record : Database.RecordList) {
             if (first == 1) { first = 0; continue; }
             games[i] = new Game(record);
             i++;
