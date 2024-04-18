@@ -1,5 +1,7 @@
 package com.project;
 
+import com.lukaspradel.steamapi.core.exception.SteamApiException;
+
 import java.util.*;
 
 public class UserData {
@@ -53,8 +55,7 @@ public class UserData {
     }
 
     // Creates game list by querying database
-    public static List<Game> CreateUserData (Database database) 
-    {   
+    public static List<Game> CreateUserData (Database database) throws SteamApiException {
         boolean UserSearch = true;
         List<Game> GamesList = new ArrayList<Game>();
         while (UserSearch) {

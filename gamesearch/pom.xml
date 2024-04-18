@@ -11,6 +11,11 @@
     <dependencies>
 
         <dependency>
+            <groupId>com.lukaspradel</groupId>
+            <artifactId>steam-web-api</artifactId>
+            <version>1.8.0</version>
+        </dependency>
+        <dependency>
             <groupId>com.googlecode.princeton-java-introduction</groupId>
             <artifactId>stdlib</artifactId>
             <version>1.0.1</version>

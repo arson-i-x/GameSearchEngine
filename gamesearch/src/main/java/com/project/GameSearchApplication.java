@@ -1,5 +1,7 @@
 package com.project;
 
+import com.lukaspradel.steamapi.core.exception.SteamApiException;
+
 import java.util.Scanner;
 
 public class GameSearchApplication {
@@ -7,8 +9,7 @@ public class GameSearchApplication {
     public static Scanner InputScanner;
 
     // Main program execution. Reads from System.in
-    public static void ExecuteProgram () 
-    {
+    public static void ExecuteProgram () throws SteamApiException {
         // Where is input read from?
         InputScanner = new Scanner(System.in);
 
@@ -46,8 +47,7 @@ public class GameSearchApplication {
     }
 
     // Runs main application
-    public static void main (String[] args) 
-    {
+    public static void main (String[] args) throws SteamApiException {
         ExecuteProgram();
     }    
 }

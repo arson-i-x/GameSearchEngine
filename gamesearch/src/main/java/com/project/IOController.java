@@ -1,9 +1,12 @@
 package com.project;
 
+import com.lukaspradel.steamapi.core.exception.SteamApiException;
+
 public class IOController {
     boolean initiated_download;
     boolean likes_game;
     int iterations;
+    static String userID;
 
     // private constructor method
     private IOController (int iterations, boolean likes_game, boolean initiated_download) 
@@ -18,13 +21,15 @@ public class IOController {
         System.out.println("Game not found");
     }
 
-    public static boolean LoginQuery () 
-    {
+    public static boolean LoginQuery () throws SteamApiException {
         System.out.println("Would you like to login? Y/N");
         String answer = GameSearchApplication.InputScanner.nextLine();
         if (answer.equals("Y") ||
             answer.equals("y")) {
-                return true;
+            System.out.println("Enter your SteamID: ");
+            userID = GameSearchApplication.InputScanner.nextLine();
+            UserLogin.Login(userID);
+            return true;
             } else {
                 System.out.println("Creating user library data....\n....");
                 return false;
@@ -38,8 +43,11 @@ public class IOController {
     }
 
     // Queries data base for user input
-    public static Game UserQuery (Database database) 
-    {
+    public static Game UserQuery (Database database) throws SteamApiException {
+        if (LoginQuery()){
+            Game Game = database.Query(UserLogin.Login(userID));
+            return Game;
+        }
         // STD IO REPLACED
         System.out.println("Enter Name of game or -1 if finished");
         String GameName = GameSearchApplication.InputScanner.nextLine();  // Read user input
