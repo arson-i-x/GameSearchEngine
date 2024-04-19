@@ -9,8 +9,9 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 
+// User class uses Steam API to create userdata from login
 public class User {
-    // get Steam client from GameSearchApp Instance
+    // get Steam client from GameSearchAppplication Instance
     private static final SteamWebApiClient client = GameSearchApplication.SteamClient;
     private static String steamID;
     private static UserData userdata;
