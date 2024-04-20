@@ -7,8 +7,8 @@ import me.xdrop.fuzzywuzzy.FuzzySearch;
 
 final public class Database {
     
-    private static final List<CSVRecord> RecordList = new ArrayList<CSVRecord>();     // list of csv records in this database
-    private static final HashMap<Long, Game> GameTable = new HashMap<Long, Game>();  // Hashmap of GameIDs and Game Objects
+    private static final List<CSVRecord> RecordList = new ArrayList<>();     // list of csv records in this database
+    private static final HashMap<Long, Game> GameTable = new HashMap<>();  // Hashmap of GameIDs and Game Objects
 
     public static void init()  // constructs a database from default path 
     {
@@ -117,32 +117,39 @@ final public class Database {
     public static void main(String[] args)      // tests database structure. Use this to ensure filepath is set correctly
     {
         Database.init();
-        int[] appids = new int[5];
-        String[] names = new String[5];
-        String[] tags = new String[5];
+        Map<Integer, Map.Entry<String, String>> map = new HashMap<>(); // Dennis - Created Map
+//        int[] appids = new int[5];
+//        String[] names = new String[5];
+//        String[] tags = new String[5];
         int index = 0;
         boolean first = true;
         for (CSVRecord record : Database.RecordList) {
             if (first) { first = false; continue; }
-            appids[index] = Integer.parseInt(record.get("App ID"));
-            names[index] = record.get("Title");
-            tags[index] = record.get("Tags");
+//            appids[index] = Integer.parseInt(record.get("App ID"));
+//            names[index] = record.get("Title");
+//            tags[index] = record.get("Tags");
+            // Dennis - Put values into map
+            map.put(Integer.parseInt(record.get("App ID")), new AbstractMap.SimpleEntry<>(record.get("Title"), record.get("Tags")));
             index++;
             if (index == 5) {
                 break;
             }
         }
-        
-        index = 0;
-        for (String taglist : tags) {
-                //System.out.println(appids[index]);
-                System.out.println(names[index]);
-            String[] SplitTags = taglist.split(",");
-            for (String tagg : SplitTags) {
-                System.out.print(tagg + " ");
-            }
-            System.out.println();
-            index++;
+
+//        index = 0;
+//        for (String taglist : tags) {
+//            //System.out.println(appids[index]);
+//            System.out.println(names[index]);
+//            String[] SplitTags = taglist.split(",");
+//            for (String tag : SplitTags) {
+//                System.out.print(tag + " ");
+//            }
+//            System.out.println("\n");
+//            index++;
+//        }
+        // Dennis - Print out values in map.
+        for (Map.Entry<Integer, Map.Entry<String, String>> entry : map.entrySet()) {
+            System.out.println("Game ID = " + entry.getKey() + "\nGame Name = " + entry.getValue().getKey() + "\nTags = " + entry.getValue().getValue());
         }
     }
 }

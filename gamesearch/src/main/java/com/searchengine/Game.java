@@ -27,12 +27,10 @@ public class Game {
         name = record.get("Title");
 
         // Game tags
-        tags = new HashSet<String>();
+        tags = new HashSet<>();
         String tagString = record.get("Tags");
         String[] tempTagList = tagString.split(",");
-        for (String tag : tempTagList) {
-            tags.add(tag);
-        }
+        tags.addAll(Arrays.asList(tempTagList));
 
         // Release date
         String tempstring = record.get("Release Date");
@@ -154,9 +152,9 @@ public class Game {
         int limit = 0;
         for (Game game : AllGames) {
             if (limit == 30) {break;}
-            System.out.println(game.name + " " + game.date.year + "-" + game.date.month + "-" + game.date.day );
+            System.out.println("Game Name: " + game.name + "\nGame Release: " + game.date.year + "-" + game.date.month + "-" + game.date.day );
             for (String tag : game.tags) {
-                System.out.print("'" + tag + "' ");
+                System.out.print("|" + tag + "| ");
             }
             System.out.println(" " + game.price);
             limit++;

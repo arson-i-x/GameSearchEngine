@@ -95,7 +95,7 @@ public class GameSearch {
         // if nothing found at this point 
         // there is a big problem. The user
         // has likely searched every game in the 
-        //data base so throw an error and exit program
+        // database so throw an error and exit program
         if (thisGame == null) {
             EXIT("NO MORE GAMES IN DATABASE!");
         }

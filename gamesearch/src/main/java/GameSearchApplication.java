@@ -35,9 +35,9 @@ public class GameSearchApplication {
         }
 
         // print user library (debug)
-        for (long gameid : User.getGames()) {
-            //System.out.println(Database.getGame(gameid).getName());
-        }
+//        for (long gameid : User.getGames()) {
+//            //System.out.println(Database.getGame(gameid).getName());
+//        }
         
         // make a graph with user data as input
         return new GameSearchApplication(new GameSearch(User.getUserData()));
