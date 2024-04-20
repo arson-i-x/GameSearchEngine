@@ -8,6 +8,7 @@ import com.searchengine.UserData;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 // User class uses Steam API to create userdata from login
 public class User {
@@ -65,7 +66,7 @@ public class User {
         return userdata;
     }
 
-    static HashSet<Long> getGames() 
+    static Set<Long> getGames()
     {
         return userdata.getGames();
     }

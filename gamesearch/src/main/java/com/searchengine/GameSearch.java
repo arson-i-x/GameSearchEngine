@@ -18,7 +18,7 @@ public class GameSearch {
     public void Search () 
     {
         int iteration = 1;
-        HashSet<Long> UserSelectedGames = userData.getGames();
+        Set<Long> UserSelectedGames = userData.getGames();
 
         // algorithm runs until exit condition met
         while (true)
