@@ -4,31 +4,31 @@ import java.util.*;
 
 public class UserData {
 
-    private HashMap<Long, List<String>> UserInfo; // Dennis - Stores steam game ID and List of Tags
+    private HashSet<Long> UserGames;        // These should be kept separate for weighting by hours played
+    private HashMap<String, Long> UserTags; 
+    private Long hoursPlayedTotal;
 
     // empty userdata constructor
     public UserData () 
     {
-        this.UserInfo = new HashMap<>(); // Dennis - Init HashMap
+        this.UserGames = new HashSet<>(); 
+        this.UserTags = new HashMap<>();
+        hoursPlayedTotal = (long)0;
     }
 
-    // Creates user data from list of games
-    private UserData (List<Game> UserSelectedGames) 
+    public UserData (UserData data) 
     {
-        this.UserInfo = new HashMap<>(); // Dennis - Init HashMap
-        // Dennis - Store game id's and their associated
-        // tags into the hashmap UserInfo.
-        for (Game game : UserSelectedGames) {
-            UserInfo.put(game.getGameID(), new ArrayList<>(game.getTags()));
-        }
+        this.UserGames = new HashSet<>(data.getGames());
+        this.UserTags = new HashMap<>(data.getTags());
+        this.hoursPlayedTotal = data.hoursPlayedTotal;
     }
 
     // Creates game list by querying database
     public static UserData CreateUserData (String query) 
     {   
+        UserData UserData = new UserData();
+
         // asks user for input and adds game if found
-        List<Game> GamesList = new ArrayList<>();
-        
         while (true) {
 
             Game game = Database.query(query);
@@ -42,35 +42,55 @@ public class UserData {
             if (game.getGameID() == -1) {  
                 break; 
             }
-            IOController.GameAdded(game);
-            GamesList.add(game);
+            UserData.addGame(game);
             query = IOController.UserQuery();
         }
 
-        return new UserData(GamesList);
+        return UserData;
     }
 
     // Creates userdata from id list
-    public static UserData CreateUserData (List<Long> idList) 
+    public static UserData CreateUserData (HashMap<Long, Long> idList) 
     {
-        // gets list of games by ID from database
-        List<Game> GamesList = new ArrayList<>();
-        for (Long id : idList) {
-            if (Database.getGame(id) != null) {
-                GamesList.add(Database.getGame(id));
-            }
-        }
+        UserData userData = new UserData();
 
-        return new UserData(GamesList);
+        for (Long gameid : idList.keySet()) {
+            userData.UserGames.add(gameid);
+            Game game = Database.getGame(gameid);
+            if (game != null) {
+                long hoursPlayed = idList.get(gameid);
+                userData.hoursPlayedTotal += hoursPlayed;
+                for (String tag : game.getTags().keySet()) {
+                    userData.hoursPlayedTotal += idList.get(gameid);
+                    userData.UserTags.put(tag, (userData.UserTags.containsKey(tag)) ?       // hashes tag and hours played of the tag
+                                            (userData.UserTags.get(tag) + idList.get(gameid)) : 
+                                            (idList.get(gameid)));
+                }
+            }   
+        }
+        return userData;
     }
 
     void addGame (Game game) 
     {
-        UserInfo.put(game.getGameID(), new ArrayList<>(game.getTags()));
+        UserGames.add(game.getGameID());
+        UserTags.putAll(game.getTags());
+        hoursPlayedTotal += 1;
+        IOController.GameAdded(game);
     }  
 
     public Set<Long> getGames()
     {
-        return UserInfo.keySet();
+        return UserGames;
+    }
+
+    public HashMap<String, Long> getTags() 
+    {
+        return UserTags;
+    }
+
+    public Long getTagWeight (String tag) 
+    {
+        return UserTags.get(tag);
     }
 }

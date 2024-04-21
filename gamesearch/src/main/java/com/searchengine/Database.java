@@ -50,7 +50,7 @@ final public class Database {
     static Game query(String GameName) // Query Database with name of game and return Game Object    {
     {
         // if done searching return an empty game object
-        if (GameName.equals("-1")) {
+        if (GameName.equals("-done")) {
             return new Game(null);
         }
 
@@ -77,7 +77,7 @@ final public class Database {
         }
 
         // compare user input to names in table and return best match
-        return Database.getGame(bestGameID);
+        return getGame(bestGameID);
     }
 
     static void parseCSV(String path)   // parses a CSV file into database using given string path as input

@@ -17,95 +17,122 @@ public class GameSearch {
     // search and present games
     public void Search () 
     {
+        UserData S = new UserData(userData);
         int iteration = 1;
-        Set<Long> UserSelectedGames = userData.getGames();
+        Game GameToPresent = null;
 
         // algorithm runs until exit condition met
         while (true)
         {
             // choose next best game from source
-            Game GameToPresent = ChooseNext();
-            IOController.PresentGameToUser(GameToPresent);
-            switch (IOController.state) {
-                case IOController.EXIT:
-                    IOController.cache(GameToPresent);
-                    GameSearch.EXIT();
-                case IOController.LIKE:
-                    userData.addGame(GameToPresent);
-                    IOController.state = IOController.SEARCH;
-            }
+            GameToPresent = ChooseNext(S, GameToPresent);
 
             // remove this game
             GameToPresent.RemoveGame();
-    
+
+            // present this game
+            IOController.PresentGameToUser(GameToPresent);
+
+            // read input state
+            switch (IOController.getState()) {
+                case IOController.EXIT:
+                    GameSearch.EXIT(GameToPresent);
+                case IOController.LIKE:
+                    S.addGame(GameToPresent);
+            }
+
+            // reset io state
+            IOController.resetState();
+
             // if user has said no to too many games, 
             // clear out array and restart searching
             if (iteration > MAX_ITERATIONS) {
-                UserSelectedGames.clear();
+                IOController.MESSAGE("Revising search algorithm");
+                Search();
             }
         }
     }
 
-    // chooses next game from the database by tag matches to user games
-    private Game ChooseNext () 
+    private Game ChooseNext (UserData S, Game lastGame)     // chooses next game from the database by tag matches to user games 
     {
         // if user data is empty then return random game
-        if (userData.getGames().isEmpty()) {
-            IOController.ERROR("Returning random game.");
+        if (S.getGames().isEmpty()) {
+            IOController.MESSAGE("Returning random game.");
             return Database.getRandomGame();
         }
 
         // chooses next game in database by highest # of tag matches.
         // using user data and games already selected to match tags
-        Game thisGame = null;
-        int maxWeight = Integer.MIN_VALUE; // minimum # of matches
-        for (Game nextGame : Database.getAllGames()) {
-            if (nextGame.IsRemoved() || userData.getGames().contains(nextGame.getGameID())) { continue; } // prevents returning owned or removed games
-            if (thisGame != null && thisGame.getReviewScore() > nextGame.getReviewScore() && thisGame.getPopularity() > nextGame.getPopularity()) {  
+        Game nextGame = null;
+        double maxWeight = Double.MIN_VALUE; // minimum # of matches
+        
+        
+        
+        for (Game thisGame : Database.getAllGames()) {
+            
+            if (lastGame != null && lastGame.similarTo(thisGame)) { 
+                thisGame.RemoveGame(); //       TODO do we actually wanna remove this if the name is similar??
+                continue;             // this will prevent sequels from appearing too often if the user doesn't like them 
+            }
+
+            if (thisGame.IsRemoved() || userData.getGames().contains(thisGame.getGameID())) { continue; } // prevents returning owned or removed games
+            
+            if (nextGame != null && nextGame.getReviewScore() > thisGame.getReviewScore() && nextGame.getPopularity() > thisGame.getPopularity()) {  
+                //System.out.println("REVIEW SCORE 1 " + thisGame.getReviewScore() + "> REVIEW SCORE 2 " + nextGame.getReviewScore());
                 // if thisGame got better reviews and is more popular than nextGame then skip nextGame
                 continue;                                                   
             }
             
-            int currWeight = 0;
+            double currWeight = 0;
             
-            
-            
-            // check Sources to this game
-            for (Long SourceID: userData.getGames()) {
+            for (Long SourceID: S.getGames()) {
                 Game Source = Database.getGame(SourceID);
-                for (String tag : Source.getTags()) {
-                    if (nextGame.getTags().contains(tag)) {
-                        currWeight++;
-                    } else {
-                        currWeight--;
-                    }
+                HashMap<String, Long> tags1;
+                HashMap<String, Long> tags2;
+                if (Source == null) { continue; }
+                // tags1 should be smallest list
+                if (Source.getTags().size() > thisGame.getTags().size()) {
+                    tags1 = thisGame.getTags();
+                    tags2 = Source.getTags();
+                } else {
+                    tags1 = Source.getTags();
+                    tags2 = thisGame.getTags();
                 }
+
+                // iterate tag list with less values
+                for (String tag : tags1.keySet()) {
+                    if (tags2.containsKey(tag)) {
+                        currWeight+= userData.getTagWeight(tag);    // Brandon - GETS TAG WEIGHT BY HOURS PLAYED
+                    } else {
+                        currWeight-= tags1.get(tag);                // REMOVES WEIGHT BY TAG RANK IN GAME'S TAG LIST
+                    }
+                    
+                }
+
             }
-
-
 
             // if combined weight is biggest found
             // update thisGame to return
             if (currWeight > maxWeight) {
                 maxWeight = currWeight;
-                thisGame = nextGame;
+                nextGame = thisGame;
             }
         }
 
         // if nothing found at this point 
         // there is a big problem. The user
         // has likely searched every game in the 
-        // database so throw an error and exit program
-        if (thisGame == null) {
+        //data base so throw an error and exit program
+        if (nextGame == null) {
             EXIT("NO MORE GAMES IN DATABASE!");
         }
 
-        return thisGame;
+        return nextGame;
     }
 
-    public static void EXIT() 
+    public static void EXIT(Game game) 
     {
-        IOController.EXIT((Game)IOController.getCache());
+        IOController.EXIT(game);
         System.exit(0);
     }
 

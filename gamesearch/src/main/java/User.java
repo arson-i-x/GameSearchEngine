@@ -6,6 +6,7 @@ import com.searchengine.GameSearch;
 import com.searchengine.IOController;
 import com.searchengine.UserData;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -23,18 +24,14 @@ public class User {
         Object ID = IOController.LoginQuery();
         if (ID instanceof Long) {
             steamID = ID.toString();
-            //System.out.println(steamID);
-            GetOwnedGamesRequest req = new GetOwnedGamesRequest.GetOwnedGamesRequestBuilder(steamID).includePlayedFreeGames(true).buildRequest();
+            GetOwnedGamesRequest req = new GetOwnedGamesRequest.GetOwnedGamesRequestBuilder(steamID).includeAppInfo(true).includePlayedFreeGames(true).buildRequest();
             GetOwnedGames games = client.processRequest(req);
-            List<Long> gameIDList = new ArrayList<Long>();
+            HashMap<Long, Long> gameIDList = new HashMap<>();
             List<com.lukaspradel.steamapi.data.json.ownedgames.Game> gameList = games.getResponse().getGames();
-            if (gameList.isEmpty()) {
-                System.out.println("error empty");
-            }
             for (com.lukaspradel.steamapi.data.json.ownedgames.Game game : gameList) {
                 loginsuccess = true;
                 //System.out.println(game.getAppid());
-                gameIDList.add(game.getAppid());
+                gameIDList.put(game.getAppid(), game.getPlaytimeForever()); // Brandon - Also hashes user playtime
             }
             userdata = UserData.CreateUserData(gameIDList);
         } else {

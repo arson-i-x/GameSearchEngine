@@ -1,9 +1,6 @@
 import com.searchengine.*;
 import com.lukaspradel.steamapi.core.exception.SteamApiException;
 import com.lukaspradel.steamapi.webapi.client.SteamWebApiClient;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.InputStream;
 
 public class GameSearchApplication {
 
