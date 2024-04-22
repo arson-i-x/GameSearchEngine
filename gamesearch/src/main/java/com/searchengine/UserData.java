@@ -3,35 +3,32 @@ package com.searchengine;
 import java.util.*;
 
 public class UserData {
-    private HashSet<Long> UserGames;    // Stores game by ID instead of Game Object to prevent returning owned games
-    private HashSet<String> UserTags;   // Stores Hashset of tags in order user most likes
+
+    private HashSet<Long> UserGames;        // These should be kept separate for weighting by hours played
+    private HashMap<String, Long> UserTags; 
+    private Long hoursPlayedTotal;
 
     // empty userdata constructor
     public UserData () 
     {
-        this.UserGames = new HashSet<>();
-        this.UserTags = new HashSet<>();
+        this.UserGames = new HashSet<>(); 
+        this.UserTags = new HashMap<>();
+        hoursPlayedTotal = (long)0;
     }
 
-    // creates user data from list of games
-    private UserData (List<Game> UserSelectedGames) 
+    public UserData (UserData data) 
     {
-        this.UserGames = new HashSet<Long>();
-        this.UserTags = new HashSet<String>();
-        for (Game game : UserSelectedGames) {
-            this.UserGames.add(game.getGameID());
-            for (String tag : game.getTags()) {
-                this.UserTags.add(tag);
-            }
-        }
+        this.UserGames = new HashSet<>(data.getGames());
+        this.UserTags = new HashMap<>(data.getTags());
+        this.hoursPlayedTotal = data.hoursPlayedTotal;
     }
 
     // Creates game list by querying database
     public static UserData CreateUserData (String query) 
     {   
+        UserData UserData = new UserData();
+
         // asks user for input and adds game if found
-        List<Game> GamesList = new ArrayList<Game>();
-        
         while (true) {
 
             Game game = Database.query(query);
@@ -45,38 +42,55 @@ public class UserData {
             if (game.getGameID() == -1) {  
                 break; 
             }
-            IOController.GameAdded(game);
-            GamesList.add(game);
+            UserData.addGame(game);
             query = IOController.UserQuery();
         }
 
-        return new UserData(GamesList);
+        return UserData;
     }
 
     // Creates userdata from id list
-    public static UserData CreateUserData (List<Long> idList) 
+    public static UserData CreateUserData (HashMap<Long, Long> idList) 
     {
-        // gets list of games by ID from database
-        List<Game> GamesList = new ArrayList<Game>();
-        for (Long id : idList) {
-            if (Database.getGame(id) != null) {
-                GamesList.add(Database.getGame(id));
-            }
-        }
+        UserData userData = new UserData();
 
-        return new UserData(GamesList);
+        for (Long gameid : idList.keySet()) {
+            userData.UserGames.add(gameid);
+            Game game = Database.getGame(gameid);
+            if (game != null) {
+                long hoursPlayed = idList.get(gameid);
+                userData.hoursPlayedTotal += hoursPlayed;
+                for (String tag : game.getTags().keySet()) {
+                    userData.hoursPlayedTotal += idList.get(gameid);
+                    userData.UserTags.put(tag, (userData.UserTags.containsKey(tag)) ?       // hashes tag and hours played of the tag
+                                            (userData.UserTags.get(tag) + idList.get(gameid)) : 
+                                            (idList.get(gameid)));
+                }
+            }   
+        }
+        return userData;
     }
 
     void addGame (Game game) 
     {
         UserGames.add(game.getGameID());
-        for (String tag : game.getTags()) {
-            UserTags.add(tag);
-        }
+        UserTags.putAll(game.getTags());
+        hoursPlayedTotal += 1;
+        IOController.GameAdded(game);
     }  
 
-    public HashSet<Long> getGames() 
+    public Set<Long> getGames()
     {
         return UserGames;
+    }
+
+    public HashMap<String, Long> getTags() 
+    {
+        return UserTags;
+    }
+
+    public Long getTagWeight (String tag) 
+    {
+        return UserTags.get(tag);
     }
 }

@@ -2,6 +2,8 @@ package com.searchengine;
 import java.util.*;
 import org.apache.commons.csv.CSVRecord;
 
+import me.xdrop.fuzzywuzzy.FuzzySearch;
+
 public class Game {
     private long gameID;
     private String name;
@@ -9,7 +11,7 @@ public class Game {
     private int reviewRatio;
     private int reviewCount;
     private String URL;
-    private HashSet<String> tags;
+    private HashMap<String, Long> tags;
     private boolean removed;
     private ReleaseDate date;
 
@@ -26,12 +28,12 @@ public class Game {
         gameID = Long.parseLong(record.get("App ID"));
         name = record.get("Title");
 
-        // Game tags
-        tags = new HashSet<String>();
+        // places game tags into hashmap by rank order within game
+        tags = new HashMap<>();
         String tagString = record.get("Tags");
         String[] tempTagList = tagString.split(",");
-        for (String tag : tempTagList) {
-            tags.add(tag);
+        for (int i = tempTagList.length; i > 0; i--) {
+            tags.put(tempTagList[tempTagList.length - i], (long)i);
         }
 
         // Release date
@@ -115,11 +117,20 @@ public class Game {
         return URL;
     }
 
-    HashSet<String> getTags() 
+    HashMap<String, Long> getTags() 
     {
         return tags;
     }
     
+    public boolean similarTo (Game otherGame) 
+    {
+        if (FuzzySearch.ratio(name, otherGame.getName()) > 75) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
     private final class ReleaseDate implements Comparable<ReleaseDate>  // release dates can be compared easily using this class
     {
         int year;
@@ -154,9 +165,9 @@ public class Game {
         int limit = 0;
         for (Game game : AllGames) {
             if (limit == 30) {break;}
-            System.out.println(game.name + " " + game.date.year + "-" + game.date.month + "-" + game.date.day );
-            for (String tag : game.tags) {
-                System.out.print("'" + tag + "' ");
+            System.out.println("Game Name: " + game.name + "\nGame Release: " + game.date.year + "-" + game.date.month + "-" + game.date.day );
+            for (String tag : game.tags.keySet()) {
+                System.out.print("|" + tag + "| ");
             }
             System.out.println(" " + game.price);
             limit++;
