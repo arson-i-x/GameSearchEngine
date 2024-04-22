@@ -64,7 +64,7 @@ public class GameSearch {
         // chooses next game in database by highest # of tag matches.
         // using user data and games already selected to match tags
         Game nextGame = null;
-        double maxWeight = Double.MIN_VALUE; // minimum # of matches
+        long maxWeight = Long.MIN_VALUE; // minimum # of matches
         
         
         
@@ -83,28 +83,19 @@ public class GameSearch {
                 continue;                                                   
             }
             
-            double currWeight = 0;
+            long currWeight = 0;
             
             for (Long SourceID: S.getGames()) {
+               
                 Game Source = Database.getGame(SourceID);
-                HashMap<String, Long> tags1;
-                HashMap<String, Long> tags2;
+                
                 if (Source == null) { continue; }
-                // tags1 should be smallest list
-                if (Source.getTags().size() > thisGame.getTags().size()) {
-                    tags1 = thisGame.getTags();
-                    tags2 = Source.getTags();
-                } else {
-                    tags1 = Source.getTags();
-                    tags2 = thisGame.getTags();
-                }
-
-                // iterate tag list with less values
-                for (String tag : tags1.keySet()) {
-                    if (tags2.containsKey(tag)) {
-                        currWeight+= userData.getTagWeight(tag);    // Brandon - GETS TAG WEIGHT BY HOURS PLAYED
+                
+                for (String tag : Source.getTags().keySet()) {
+                    if (thisGame.getTags().containsKey(tag)) {
+                        currWeight+= S.getTagWeight(tag);    // Brandon - GETS TAG WEIGHT BY HOURS PLAYED
                     } else {
-                        currWeight-= tags1.get(tag);                // REMOVES WEIGHT BY TAG RANK IN GAME'S TAG LIST
+                        currWeight-= S.getTags().get(tag);   // REMOVES WEIGHT BY TAG RANK IN GAME'S TAG LIST
                     }
                     
                 }
@@ -116,6 +107,7 @@ public class GameSearch {
             if (currWeight > maxWeight) {
                 maxWeight = currWeight;
                 nextGame = thisGame;
+                System.out.println("Next game is "+ nextGame.getName());
             }
         }
 

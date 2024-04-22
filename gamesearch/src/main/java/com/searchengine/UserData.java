@@ -6,14 +6,14 @@ public class UserData {
 
     private HashSet<Long> UserGames;        // These should be kept separate for weighting by hours played
     private HashMap<String, Long> UserTags; 
-    private Long hoursPlayedTotal;
+    private long hoursPlayedTotal;
 
     // empty userdata constructor
     public UserData () 
     {
         this.UserGames = new HashSet<>(); 
         this.UserTags = new HashMap<>();
-        hoursPlayedTotal = (long)0;
+        hoursPlayedTotal = 0;
     }
 
     public UserData (UserData data) 
@@ -61,10 +61,9 @@ public class UserData {
                 long hoursPlayed = idList.get(gameid);
                 userData.hoursPlayedTotal += hoursPlayed;
                 for (String tag : game.getTags().keySet()) {
-                    userData.hoursPlayedTotal += idList.get(gameid);
                     userData.UserTags.put(tag, (userData.UserTags.containsKey(tag)) ?       // hashes tag and hours played of the tag
-                                            (userData.UserTags.get(tag) + idList.get(gameid)) : 
-                                            (idList.get(gameid)));
+                                            (userData.UserTags.get(tag) + hoursPlayed) : 
+                                            (hoursPlayed));
                 }
             }   
         }
