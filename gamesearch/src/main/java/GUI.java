@@ -27,6 +27,15 @@ public class GUI extends JFrame{
                 }
             }
         });
+        noButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (e.getSource() == noButton){
+                    dispose();
+                    NoButtonGUI noGUI = new NoButtonGUI();
+                }
+            }
+        });
     }
 
     public static void main(String[] args) {
