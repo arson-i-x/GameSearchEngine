@@ -16,7 +16,7 @@
 //        setVisible(true);
 //        setContentPane(LoginPanel);
 //
-//        //GameSearchApplication.BuildUserSearch().GameSearch();
+//        //com.searchengine.GameSearchApplication.BuildUserSearch().GameSearch();
 //
 //        yesButton.addActionListener(new ActionListener() {
 //            @Override

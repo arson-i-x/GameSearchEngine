@@ -1,3 +1,5 @@
+package com.searchengine;
+
 import com.lukaspradel.steamapi.core.exception.SteamApiException;
 import com.lukaspradel.steamapi.data.json.ownedgames.GetOwnedGames;
 import com.lukaspradel.steamapi.webapi.client.SteamWebApiClient;
@@ -5,13 +7,12 @@ import com.lukaspradel.steamapi.webapi.request.GetOwnedGamesRequest;
 import com.searchengine.GameSearch;
 import com.searchengine.IOController;
 import com.searchengine.UserData;
-import java.util.ArrayList;
+
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-// User class uses Steam API to create userdata from login
+// com.searchengine.User class uses Steam API to create userdata from login
 public class User {
     // get Steam client from GameSearchAppplication Instance
     private static final SteamWebApiClient client = GameSearchApplication.SteamClient;
@@ -20,8 +21,8 @@ public class User {
     private static boolean loginsuccess;
 
     // takes ID or game name as input and creates associated userdata
-    static void Login () throws SteamApiException {
-        Object ID = IOController.LoginQuery();
+    public static void Login (String steamID) throws SteamApiException {
+        Object ID = IOController.LoginQuery(steamID);
         if (ID instanceof Long) {
             steamID = ID.toString();
             GetOwnedGamesRequest req = new GetOwnedGamesRequest.GetOwnedGamesRequestBuilder(steamID).includeAppInfo(true).includePlayedFreeGames(true).buildRequest();

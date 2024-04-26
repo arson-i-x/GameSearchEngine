@@ -1,17 +1,15 @@
 package UI;
-
+import com.searchengine.*;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.ListView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 
-import java.io.IOException;
 
-import com.searchengine.Game;
+import java.io.IOException;
 
 public class LoginqueryWindow {
     @FXML
@@ -23,6 +21,7 @@ public class LoginqueryWindow {
     private String title = "CS310 Project: Steam Game Searcher";
     protected Stage stage;
     protected FXMLLoader loader;
+
     public void open() {
         FXMLLoader launchLoader = new FXMLLoader(getClass().getResource(fxmlResource));
         Parent root = null;
@@ -41,12 +40,16 @@ public class LoginqueryWindow {
         this.loader = launchLoader;
         this.stage = launchStage;
     }
-
+    // Submit button
     @FXML
     public void onSubmitID() {
         String idText = steamIDInput.getText();
-        System.out.println(idText);
-
+        //System.out.println(idText);
+        //gameListView.appendText(idText);
 //        gameListView.setItems();
+        gameListView.clear();
+        GameSearchApplication.BuildUserSearch(idText).GameSearch();
+
+
     }
 }
