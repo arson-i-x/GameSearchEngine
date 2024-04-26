@@ -1,4 +1,5 @@
-import com.searchengine.*;
+package com.searchengine;
+
 import com.lukaspradel.steamapi.core.exception.SteamApiException;
 import com.lukaspradel.steamapi.webapi.client.SteamWebApiClient;
 
@@ -16,14 +17,14 @@ public class GameSearchApplication {
     }
     
     // Main program execution. Reads from System.in
-    public static GameSearchApplication BuildUserSearch () 
+    public static GameSearchApplication BuildUserSearch (String steamID)
     {
         // init database
         Database.init();
 
         // user login
         try {
-            User.Login();
+            User.Login(steamID);
             if (!User.getLoginSuccess()) {
                 IOController.ERROR("Make sure your Steam Library is set to public.");
             }
@@ -32,7 +33,7 @@ public class GameSearchApplication {
         }
 
         // print user library (debug)
-//        for (long gameid : User.getGames()) {
+//        for (long gameid : com.searchengine.User.getGames()) {
 //            //System.out.println(Database.getGame(gameid).getName());
 //        }
         
@@ -51,7 +52,7 @@ public class GameSearchApplication {
         return new GameSearchApplication(new GameSearch(User.getUserData()));
     }
 
-    public void GameSearch () 
+    public void GameSearch ()
     {
         SearchInstance.Search();
     }

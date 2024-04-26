@@ -1,4 +1,7 @@
 package com.searchengine;
+
+import UI.LoginqueryWindow;
+
 import java.io.PrintStream;
 import java.util.Scanner;
 
@@ -8,7 +11,7 @@ public class IOController {
     // GUI WILL MOST LIKELY BE IMPLEMENTED INTO SYSTEM.IN and OUT
     private static final Scanner inputScanner = new Scanner(System.in);
     private static final PrintStream outputStream = new PrintStream(System.out);
-    
+
     // Stores state as an int
     static final int EXIT = 2;
     static final int LIKE = 1;
@@ -18,18 +21,17 @@ public class IOController {
     private static int state;
 
 
-    public static Object LoginQuery () // reads login object from input either a long steamid or a game name
+    public static Object LoginQuery (String userInput) // reads login object from input either a long steamid or a game name
     {
-        outputStream.println("Enter your SteamID to insert your entire library OR enter names of games to create a library");
-        String input = inputScanner.nextLine();
-
+        //outputStream.println("Enter your SteamID to insert your entire library OR enter names of games to create a library");
+        //String input = inputScanner.nextLine();
+        String input = userInput;
         try {
             Long id = Long.parseLong(input);
             return id;
-        } catch (NumberFormatException nfe) {
-            //ERROR(nfe.getMessage());
+        } catch (NumberFormatException nfe){
             return input;
-        }     
+        }
     }
 
     static int getState() 
@@ -47,7 +49,7 @@ public class IOController {
         outputStream.println(Query.getName() + " added to library!");
     }
 
-    static String UserQuery () // Queries data base for user input
+    public static String UserQuery () // Queries data base for user input
     {
         // STD IO REPLACED
         outputStream.println("Enter Name of game or -done if finished");
@@ -55,11 +57,11 @@ public class IOController {
         return input;  // Read user input
     }
 
-    static void PresentGameToUser (Game Game)  // changes io state according to input 
+    public static void PresentGameToUser (Game Game)  // changes io state according to input
     {
         //  Show the game to user and wait for input. Store their input in IOController
         outputStream.println("Your Game is: " + Game.getName() + " " + Game.getURL() + " " + "  Would you like to download it? Y/N");
-        
+
         String download = inputScanner.nextLine();  // Read user input
         if (download.equals("Y") || download.equals("y")) {
             state = EXIT;
