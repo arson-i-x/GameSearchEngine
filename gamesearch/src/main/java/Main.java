@@ -1,5 +1,4 @@
 import UI.SearcherApplication;
-import UI.WINDOW;
 
 public class Main {
     public static void main (String[] args) {

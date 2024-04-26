@@ -1,31 +1,59 @@
 package com.searchengine;
+
 import java.util.*;
 
-public class GameSearch {
+
+public class GameSearch extends Thread {
     
     // how many times user can say no
-    private static final int MAX_ITERATIONS = 5;
-    
-    private UserData userData;
+    private static final int MAX_DISLIKES = 10;
 
-    // constructs weighted graph using Database as input
-    public GameSearch (UserData data) 
+    // how many times the algorithm will loop also controls accuracy of matches
+    // TODO balance cache use with MAX_ITERATIONS to find optimal accuracy
+    private static final int MAX_ITERATIONS = 5000; 
+    
+    public UserData preUserData;  // holds users games
+    private UserData postUserData; // working userdata object
+    private Map<Game, Long> cache; // holds weight of games already calculated
+    private int iteration;
+
+    public GameSearch (UserData data) // Searches a game database using Userdata as input
     {
-        this.userData = data;
+        this.preUserData = data;
+        this.postUserData = new UserData(data);
+        this.cache = new LinkedHashMap<>();
+        this.iteration = 0;
+    }
+
+    // removes game from cache if it contains tags matching thisGame
+    // making sure its weight is recalculated later
+    private void recache(Game thisGame) 
+    {
+        Iterator<Game> iter = cache.keySet().iterator();
+
+        while (iter.hasNext()) {
+            Game game = iter.next();
+            
+            if (!Collections.disjoint((Collection<String>)game.getTags(), 
+            (Collection<String>)thisGame.getTags())) 
+            { // Returns true if games have no matches
+                iter.remove();
+            }
+        }
     }
 
     // search and present games
-    public void Search () 
+    @Override
+    public void run () 
     {
-        UserData S = new UserData(userData);
-        int iteration = 1;
+        UserData tempUserData = new UserData(postUserData);
+
         Game GameToPresent = null;
 
-        // algorithm runs until exit condition met
-        while (true)
+        while (true) // algorithm runs until exit condition met
         {
             // choose next best game from source
-            GameToPresent = ChooseNext(S, GameToPresent);
+            GameToPresent = ChooseNext(tempUserData, GameToPresent);
 
             // remove this game
             GameToPresent.RemoveGame();
@@ -36,9 +64,12 @@ public class GameSearch {
             // read input state
             switch (IOController.getState()) {
                 case IOController.EXIT:
-                    GameSearch.EXIT(GameToPresent);
+                    GameSearch.EXIT(GameToPresent); 
                 case IOController.LIKE:
-                    S.addGame(GameToPresent);
+                    iteration = 0;  
+                    tempUserData.addGame(GameToPresent); 
+                    recache(GameToPresent); // removes games that need to be recalculated
+                    GameToPresent = null;
             }
 
             // reset io state
@@ -46,75 +77,92 @@ public class GameSearch {
 
             // if user has said no to too many games, 
             // clear out array and restart searching
-            if (iteration > MAX_ITERATIONS) {
+            if (iteration > MAX_DISLIKES) {
                 IOController.MESSAGE("Revising search algorithm");
-                Search();
+                postUserData.removeSomeGames();
+                cache.clear();
+                run();
+            } else {
+                iteration++;
             }
         }
     }
 
-    private Game ChooseNext (UserData S, Game lastGame)     // chooses next game from the database by tag matches to user games 
+    private Game ChooseNext (UserData tempUserData, Game lastGame)     // chooses next game from the database by tag matches to user games 
     {
         // if user data is empty then return random game
-        if (S.getGames().isEmpty()) {
+        if (tempUserData.getGames().isEmpty()) {
             IOController.MESSAGE("Returning random game.");
             return Database.getRandomGame();
         }
 
-        // chooses next game in database by highest # of tag matches.
-        // using user data and games already selected to match tags
-        Game nextGame = null;
+        Game nextGame = null; // initializer
+
         long maxWeight = Long.MIN_VALUE; // minimum # of matches
         
-        
-        
+        int iteration = 0;  // breaks when past MAX_ITERATIONS
+
         for (Game thisGame : Database.getAllGames()) {
+
+            long currWeight = 0;
+
+            if (thisGame.similarTo(lastGame) || thisGame.IsRemoved() || this.preUserData.getGames().containsKey(thisGame.getGameID())) { 
+                continue; // prevents returning owned or removed games
+            } 
             
-            if (lastGame != null && lastGame.similarTo(thisGame)) { 
-                thisGame.RemoveGame(); //       TODO do we actually wanna remove this if the name is similar??
-                continue;             // this will prevent sequels from appearing too often if the user doesn't like them 
+            if (nextGame != null && (nextGame.getPopularity() > thisGame.getPopularity() && nextGame.getReviewScore() > thisGame.getReviewScore())) {  
+                continue; // if nextGame got better reviews and is more popular than thisGame then skip thisGame                                            
             }
 
-            if (thisGame.IsRemoved() || userData.getGames().contains(thisGame.getGameID())) { continue; } // prevents returning owned or removed games
-            
-            if (nextGame != null && nextGame.getReviewScore() > thisGame.getReviewScore() && nextGame.getPopularity() > thisGame.getPopularity()) {  
-                //System.out.println("REVIEW SCORE 1 " + thisGame.getReviewScore() + "> REVIEW SCORE 2 " + nextGame.getReviewScore());
-                // if thisGame got better reviews and is more popular than nextGame then skip nextGame
-                continue;                                                   
+            // CHECK CACHE FOR WEIGHT BEFORE CALCULATING ANYTHING ELSE
+            if (cache.containsKey(thisGame)) {
+                currWeight = cache.get(thisGame);
+                if (currWeight > maxWeight) {
+                    nextGame = thisGame;
+                    maxWeight = currWeight;
+                    /*      DEBUG  */     IOController.MESSAGE("Next cached game is "+ thisGame.getName() + "with weight " + currWeight);
+                }
+                continue;
             }
-            
-            long currWeight = 0;
-            
-            for (Long SourceID: S.getGames()) {
+
+            // check each user game and compare its tags to this game by tag weights (hours played)
+            for (Long SourceID: tempUserData.getGames().keySet()) {
                
                 Game Source = Database.getGame(SourceID);
                 
-                if (Source == null) { continue; }
+                if (Source == null || Source.getGameID() == thisGame.getGameID()) { continue; }
                 
-                for (String tag : Source.getTags().keySet()) {
-                    if (thisGame.getTags().containsKey(tag)) {
-                        currWeight+= S.getTagWeight(tag);    // Brandon - GETS TAG WEIGHT BY HOURS PLAYED
+                for (String tag : Source.getTags()) {
+                    if (thisGame.getTags().contains(tag)) {
+                        currWeight+= tempUserData.getTagWeight(tag);  
                     } else {
-                        currWeight-= S.getTags().get(tag);   // REMOVES WEIGHT BY TAG RANK IN GAME'S TAG LIST
+                        currWeight-= tempUserData.getTagWeight(tag); 
                     }
-                    
                 }
-
             }
+
+            // cache this games weight and increment
+            cache.put(thisGame, currWeight);
+            iteration++;
 
             // if combined weight is biggest found
             // update thisGame to return
             if (currWeight > maxWeight) {
                 maxWeight = currWeight;
                 nextGame = thisGame;
-                System.out.println("Next game is "+ nextGame.getName());
+                iteration = 0;
+                /*      DEBUG  */     IOController.MESSAGE("Next game is "+ nextGame.getName() + "with weight " + currWeight);
+            }
+
+            if (iteration > MAX_ITERATIONS) {
+               break;
             }
         }
 
         // if nothing found at this point 
         // there is a big problem. The user
         // has likely searched every game in the 
-        //data base so throw an error and exit program
+        // data base so throw an error and exit program
         if (nextGame == null) {
             EXIT("NO MORE GAMES IN DATABASE!");
         }
@@ -147,6 +195,6 @@ public class GameSearch {
             System.out.println(game.getName());
         }
 
-        NewGraph.Search();
+        NewGraph.start();
     }
 }

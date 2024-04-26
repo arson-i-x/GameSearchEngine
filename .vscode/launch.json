@@ -3,6 +3,13 @@
   "configurations": [
     {
       "type": "java",
+      "name": "IOController",
+      "request": "launch",
+      "mainClass": "com.searchengine.IOController",
+      "projectName": "gamesearchengine"
+    },
+    {
+      "type": "java",
       "name": "GameSearch",
       "request": "launch",
       "mainClass": "com.searchengine.GameSearch",

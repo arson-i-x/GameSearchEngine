@@ -5,13 +5,14 @@ import org.apache.commons.csv.CSVRecord;
 import me.xdrop.fuzzywuzzy.FuzzySearch;
 
 public class Game {
-    private long gameID;
+    private Long gameID;
     private String name;
     private int price;
     private int reviewRatio;
     private int reviewCount;
     private String URL;
-    private HashMap<String, Long> tags;
+    private String priceString;
+    private HashSet<String> tags;
     private boolean removed;
     private ReleaseDate date;
 
@@ -29,12 +30,10 @@ public class Game {
         name = record.get("Title");
 
         // places game tags into hashmap by rank order within game
-        tags = new HashMap<>();
+        tags = new LinkedHashSet<>();
         String tagString = record.get("Tags");
         String[] tempTagList = tagString.split(",");
-        for (int i = tempTagList.length; i > 0; i--) {
-            tags.put(tempTagList[tempTagList.length - i], (long)i);
-        }
+        tags.addAll(Arrays.asList(tempTagList));
 
         // Release date
         String tempstring = record.get("Release Date");
@@ -57,6 +56,9 @@ public class Game {
             }
 
         }
+        
+        // gets review count
+        reviewCount = Integer.parseInt(record.get("Reviews Total"));
 
         // Splits input into ratio e.g. (88,64%) -> (88)
         String reviews = record.get("Reviews Score Fancy");
@@ -64,17 +66,29 @@ public class Game {
         reviewRatio = Integer.parseInt(reviews.split(",")[0]);
 
         // Gets int value from dollar amount
-        String priceString = record.get("Launch Price");
-        //price = Integer.parseInt(priceString.replace("$", "").replace(",", ""));
+        priceString = record.get("Launch Price");
+        String temp = priceString.replaceAll("[^0-9/-]+", "");
+        price = Integer.parseInt(temp);
 
         // Game info
         URL = record.get("Steam Page");
         removed = false;
     }
 
+    @Override
+    public int hashCode() 
+    {
+        return gameID.hashCode();
+    }
+
     void RemoveGame () 
     {
         removed = true;
+    }
+
+    void InsertGame () 
+    {
+        removed = false;
     }
 
     boolean IsRemoved () 
@@ -106,6 +120,11 @@ public class Game {
     {
         return price;
     }
+
+    String getPriceString () 
+    {
+        return priceString;
+    }
     
     ReleaseDate getReleaseDate () 
     {
@@ -117,13 +136,17 @@ public class Game {
         return URL;
     }
 
-    HashMap<String, Long> getTags() 
+    Set<String> getTags() 
     {
         return tags;
     }
     
     public boolean similarTo (Game otherGame) 
     {
+        if (otherGame == null) {
+            return false;
+        }
+
         if (FuzzySearch.ratio(name, otherGame.getName()) > 75) {
             return true;
         } else {
@@ -166,7 +189,7 @@ public class Game {
         for (Game game : AllGames) {
             if (limit == 30) {break;}
             System.out.println("Game Name: " + game.name + "\nGame Release: " + game.date.year + "-" + game.date.month + "-" + game.date.day );
-            for (String tag : game.tags.keySet()) {
+            for (String tag : game.tags) {
                 System.out.print("|" + tag + "| ");
             }
             System.out.println(" " + game.price);

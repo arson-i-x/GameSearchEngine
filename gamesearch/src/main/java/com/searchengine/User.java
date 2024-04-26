@@ -4,10 +4,6 @@ import com.lukaspradel.steamapi.core.exception.SteamApiException;
 import com.lukaspradel.steamapi.data.json.ownedgames.GetOwnedGames;
 import com.lukaspradel.steamapi.webapi.client.SteamWebApiClient;
 import com.lukaspradel.steamapi.webapi.request.GetOwnedGamesRequest;
-import com.searchengine.GameSearch;
-import com.searchengine.IOController;
-import com.searchengine.UserData;
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
@@ -65,7 +61,7 @@ public class User {
     }
 
     static Set<Long> getGames()
-    {
-        return userdata.getGames();
+    {   
+        return userdata.getGames().keySet();
     }
 }

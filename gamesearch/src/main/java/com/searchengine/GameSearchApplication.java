@@ -54,7 +54,7 @@ public class GameSearchApplication {
 
     public void GameSearch ()
     {
-        SearchInstance.Search();
+        SearchInstance.start();
     }
 
     public static void main (String[] args) 

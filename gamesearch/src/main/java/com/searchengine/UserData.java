@@ -4,21 +4,21 @@ import java.util.*;
 
 public class UserData {
 
-    private HashSet<Long> UserGames;        // These should be kept separate for weighting by hours played
+    private HashMap<Long, Long> UserGames;        // These should be kept separate for weighting by hours played
     private HashMap<String, Long> UserTags; 
     private long hoursPlayedTotal;
 
     // empty userdata constructor
     public UserData () 
     {
-        this.UserGames = new HashSet<>(); 
+        this.UserGames = new HashMap<>(); 
         this.UserTags = new HashMap<>();
         hoursPlayedTotal = 0;
     }
 
     public UserData (UserData data) 
     {
-        this.UserGames = new HashSet<>(data.getGames());
+        this.UserGames = new HashMap<>(data.getGames());
         this.UserTags = new HashMap<>(data.getTags());
         this.hoursPlayedTotal = data.hoursPlayedTotal;
     }
@@ -55,12 +55,11 @@ public class UserData {
         UserData userData = new UserData();
 
         for (Long gameid : idList.keySet()) {
-            userData.UserGames.add(gameid);
             Game game = Database.getGame(gameid);
             if (game != null) {
                 long hoursPlayed = idList.get(gameid);
-                userData.hoursPlayedTotal += hoursPlayed;
-                for (String tag : game.getTags().keySet()) {
+                userData.addGame(game, hoursPlayed);
+                for (String tag : game.getTags()) {
                     userData.UserTags.put(tag, (userData.UserTags.containsKey(tag)) ?       // hashes tag and hours played of the tag
                                             (userData.UserTags.get(tag) + hoursPlayed) : 
                                             (hoursPlayed));
@@ -70,15 +69,59 @@ public class UserData {
         return userData;
     }
 
-    void addGame (Game game) 
+    void addGame (Game game, long hoursPlayed) // adds a game with specific amt of hours
     {
-        UserGames.add(game.getGameID());
-        UserTags.putAll(game.getTags());
-        hoursPlayedTotal += 1;
+        UserGames.put(game.getGameID(), hoursPlayed);
+        hoursPlayedTotal += hoursPlayed;
+       
+        game.getTags().forEach(tag -> {
+            UserTags.put(tag, getTagWeight(tag) != null ? 
+                        getTagWeight(tag) + hoursPlayedTotal 
+                        : 
+                        hoursPlayedTotal);
+                        //IOController.MESSAGE(tag + " weight is " + getTagWeight(tag));
+        });
+
         IOController.GameAdded(game);
     }  
 
-    public Set<Long> getGames()
+    void addGame (Game game) // adds a game with avg amt of hours
+    {
+        long hoursPlayed = UserGames.size() != 0 ? getAveragePlaytime() : 100;
+        hoursPlayedTotal += hoursPlayed;
+        UserGames.put(game.getGameID(), hoursPlayed);
+        addTags(game.getTags());
+        IOController.GameAdded(game);
+    }  
+
+    private void addTags(Set<String> tags) // simulates playtime based on current tag data
+    {
+        for (String tag : tags) {
+            if (UserTags.containsKey(tag)) {
+
+                IOController.MESSAGE("INCREASING " + tag + " WEIGHT " + getTagWeight(tag));
+                UserTags.put(tag, getTagWeight(tag) + getTagWeight(tag)/tags.size());
+                IOController.MESSAGE(" TO NEW WEIGHT" + getTagWeight(tag));
+            }
+            else {
+                
+                UserTags.put(tag, getAveragePlaytime());
+                IOController.MESSAGE("MAKING " + tag + " WEIGHT " + getTagWeight(tag));
+            }
+        }
+    }
+
+    public Long getTotalHoursPlayed() 
+    {
+        return hoursPlayedTotal;
+    }
+
+    public Long getAveragePlaytime () 
+    {
+        return hoursPlayedTotal / UserGames.size();
+    }
+
+    public HashMap<Long, Long> getGames()
     {
         return UserGames;
     }
@@ -91,5 +134,41 @@ public class UserData {
     public Long getTagWeight (String tag) 
     {
         return UserTags.get(tag);
+    }
+
+    public void removeSomeGames () 
+    {
+        // sort tags by playtime
+        List<Map.Entry<String,Long>> sortedTags = new LinkedList<>(UserTags.entrySet().stream().sorted(Map.Entry.comparingByValue()).toList());
+
+        // make a list of tags and gameids to remove
+        List<String> tagsToRemove = new LinkedList<>();
+        List<Long> gamesToRemove = new LinkedList<>();
+        
+        // remove 1/3 of lowest tags 
+        for (int i = 0; i < UserTags.size()/3; i++) {
+            String tag = sortedTags.get(i).getKey();
+            tagsToRemove.add(tag);
+            UserTags.remove(tag);
+        }
+
+        // add games with tags to remove
+        for (long gameid : getGames().keySet()) {
+            for (String tag : Database.getGame(gameid).getTags()) {
+                if (tagsToRemove.contains(tag)) {
+                    gamesToRemove.add(gameid);
+                }
+            }
+        }
+
+        // removes games
+        for (long gameid : gamesToRemove) {
+            UserGames.remove(gameid);
+            IOController.MESSAGE(Database.getGame(gameid).getName() + " REMOVED FROM LIBRARY!!");
+        }
+
+        for (long gameid : getGames().keySet()) {
+            IOController.MESSAGE(Database.getGame(gameid).getName());
+        }
     }
 }

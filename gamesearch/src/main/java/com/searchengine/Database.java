@@ -2,13 +2,14 @@ package com.searchengine;
 
 import java.io.*;
 import java.util.*;
+
 import org.apache.commons.csv.*;
 import me.xdrop.fuzzywuzzy.FuzzySearch;
 
 final public class Database {
     
     private static final List<CSVRecord> RecordList = new ArrayList<>();     // list of csv records in this database
-    private static final HashMap<Long, Game> GameTable = new HashMap<>();  // Hashmap of GameIDs and Game Objects
+    private static final HashMap<Long, Game> GameTable = new LinkedHashMap<>();  // Hashmap of GameIDs and Game Objects
 
     public static void init()  // constructs a database from default path 
     {
@@ -17,19 +18,14 @@ final public class Database {
 
     static Game getRandomGame() // gets random game from table
     {
-        Game randomGame = null;
         Random rand = new Random();
-        int i = rand.nextInt(GameTable.size() - 1);
-        int iterations = 0;
-        for (Game game : GameTable.values()) {
-            if (iterations == i) {
-                randomGame = game; 
-                break;
-            } else {
-                iterations++;
-            }
-        }
-        return randomGame;
+        int i = rand.nextInt(GameTable.size() - 1); 
+        return getAllGames().get(i);
+    }
+
+    public static int size () 
+    {
+        return GameTable.size();
     }
 
     public static Game getGame(Long id)      // gets game with this ID from table
@@ -37,9 +33,11 @@ final public class Database {
         return GameTable.get(id);
     }
 
-    static Collection<Game> getAllGames() // gets all game object in the database 
+    static List<Game> getAllGames() // gets all game object in the database 
     {
-        return GameTable.values();
+        List<Game> games = new LinkedList<>((GameTable.values().stream()).toList());
+        Collections.shuffle(games); // Shuffles gamelist on each call
+        return games;
     }
 
     static List<CSVRecord> getRecords()   // gets all records in the database 
@@ -50,7 +48,7 @@ final public class Database {
     static Game query(String GameName) // Query Database with name of game and return Game Object    {
     {
         // if done searching return an empty game object
-        if (GameName.equals("-done")) {
+        if (GameName.equals("-done") || GameName.equals("")) {
             return new Game(null);
         }
 

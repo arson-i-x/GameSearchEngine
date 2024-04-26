@@ -28,7 +28,11 @@
             <artifactId>steam-web-api</artifactId>
             <version>1.8.0</version>
         </dependency>
-
+        <dependency>
+            <groupId>com.github.dotxyteam</groupId>
+            <artifactId>reflection-ui</artifactId>
+            <version>5.2.8</version>
+        </dependency>
         <dependency>
             <groupId>com.googlecode.princeton-java-introduction</groupId>
             <artifactId>stdlib</artifactId>
