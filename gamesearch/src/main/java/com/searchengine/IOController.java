@@ -1,7 +1,4 @@
 package com.searchengine;
-
-import UI.LoginqueryWindow;
-
 import java.io.PrintStream;
 import java.util.Scanner;
 
@@ -11,15 +8,22 @@ public class IOController {
     // GUI WILL MOST LIKELY BE IMPLEMENTED INTO SYSTEM.IN and OUT
     private static final Scanner inputScanner = new Scanner(System.in);
     private static final PrintStream outputStream = new PrintStream(System.out);
-
+    
     // Stores state as an int
     static final int EXIT = 2;
     static final int LIKE = 1;
     static final int SEARCH = 0;
-
-    // stores the first thing entered into SYSTEM.IN
     private static int state;
 
+    public static String getTerminalInput() 
+    {
+        return inputScanner.nextLine();
+    }
+
+    public static void putTerminalOutput(String output) 
+    {
+        outputStream.println(output);
+    }
 
     public static Object LoginQuery (String userInput) // reads login object from input either a long steamid or a game name
     {
@@ -79,13 +83,13 @@ public class IOController {
         state = SEARCH;
     }
 
-    public static void ERROR(String errorMessage) 
+    public static void ERROR(Object errorMessage) 
     {
         //inputScanner.nextLine();
         outputStream.println("ERROR: " + errorMessage);
     }
 
-    public static void MESSAGE(String message)
+    public static void MESSAGE(Object message)
     {
         outputStream.println(message);
     }

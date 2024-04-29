@@ -1,16 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.scene.control.Button?>
-<?import javafx.scene.control.TextArea?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.RowConstraints?>
 
-<AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="UI.LoginqueryWindow">
+<AnchorPane prefWidth="610.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="UI.LoginWindow">
    <children>
-      <GridPane layoutX="211.0" layoutY="155.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="0.0">
+      <GridPane layoutX="5.0" prefHeight="166.0" prefWidth="659.0" AnchorPane.bottomAnchor="-166.0" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="-54.0" AnchorPane.topAnchor="0.0">
         <columnConstraints>
           <ColumnConstraints hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="10.0" prefWidth="200.0" />
           <ColumnConstraints hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="10.0" prefWidth="200.0" />
@@ -22,9 +21,8 @@
           <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
         </rowConstraints>
          <children>
-            <Button fx:id="submitIDButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#onSubmitID" text="Submit" GridPane.columnIndex="2" />
+            <Button fx:id="submitIDButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#onLogin" text="Submit" GridPane.columnIndex="2" />
             <TextField fx:id="steamIDInput" maxWidth="-Infinity" prefHeight="25.0" prefWidth="400.0" promptText="Enter Your Steam ID Name" GridPane.columnSpan="2147483647" />
-            <TextArea fx:id="gameListView" prefHeight="200.0" prefWidth="200.0" GridPane.columnSpan="2147483647" GridPane.rowIndex="1" GridPane.rowSpan="2" />
          </children>
       </GridPane>
    </children>
