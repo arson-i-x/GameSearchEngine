@@ -1,46 +1,33 @@
 package UI;
 
+import java.io.IOException;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
-import javafx.scene.Scene;
-import javafx.stage.Stage;
-
-import java.io.IOException;
 
 public class WINDOW {
-    private String fxmlResource = "WINDOW.fxml";
-    private String title = "CS310 Project: Steam Game Searcher";
-    protected Stage stage;
-    protected FXMLLoader loader;
-    public void open() {
-        FXMLLoader launchLoader = new FXMLLoader(getClass().getResource(fxmlResource));
-        Parent root = null;
+
+    private FXMLLoader loader;
+
+    // Open and returns a scene root using FXML Loader
+    public void open(String path) throws RuntimeException
+    {
+        loader = new FXMLLoader(getClass().getResource(path));
+    }
+
+    public Parent getRoot() 
+    {
         try {
-            root = launchLoader.load();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+            return loader.load();
+        } catch (IOException exception) {
+            throw new RuntimeException(exception);
         }
-        Scene scene = new Scene(root);
-
-        Stage launchStage = new Stage();
-        launchStage.setScene(scene);
-
-        launchStage.setTitle(title);
-        launchStage.show();
-        this.loader = launchLoader;
-        this.stage = launchStage;
     }
 
-    // This function activates when user click the yes button
-    public void onLogin(){
-        LoginqueryWindow window = new LoginqueryWindow();
-        window.open();
-    }
+    // GUI WINDOW TEST
+    public static void main (String[] args) 
+    {
 
-    // Function for the no button
+        SearchApp.launch(SearchApp.class, args);
 
-    public void notLogin(){
-        NoButtonWindow window = new NoButtonWindow();
-        window.open();
     }
 }

@@ -111,6 +111,11 @@ public class UserData {
         }
     }
 
+    public boolean isEmpty() 
+    {
+        return this.UserGames.isEmpty();
+    }
+
     public Long getTotalHoursPlayed() 
     {
         return hoursPlayedTotal;

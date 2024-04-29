@@ -15,6 +15,15 @@ public class IOController {
     static final int SEARCH = 0;
     private static int state;
 
+    public static String getTerminalInput() 
+    {
+        return inputScanner.nextLine();
+    }
+
+    public static void putTerminalOutput(String output) 
+    {
+        outputStream.println(output);
+    }
 
     public static Object LoginQuery (String userInput) // reads login object from input either a long steamid or a game name
     {

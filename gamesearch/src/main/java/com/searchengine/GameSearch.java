@@ -3,31 +3,25 @@ package com.searchengine;
 import java.util.*;
 
 
-public class GameSearch extends Thread {
-    
-    // how many times user can say no
-    private static final int MAX_DISLIKES = 10;
+public class GameSearch {
 
     // how many times the algorithm will loop also controls accuracy of matches
     // TODO balance cache use with MAX_ITERATIONS to find optimal accuracy
-    private static final int MAX_ITERATIONS = 5000; 
+    private static final int MAX_ITERATIONS = 10000; 
     
-    public UserData preUserData;  // holds users games
-    private UserData postUserData; // working userdata object
+    public UserData UserData;  // holds users games
     private Map<Game, Long> cache; // holds weight of games already calculated
     private int iteration;
 
     public GameSearch (UserData data) // Searches a game database using Userdata as input
     {
-        this.preUserData = data;
-        this.postUserData = new UserData(data);
+        this.UserData = data;
         this.cache = new LinkedHashMap<>();
         this.iteration = 0;
     }
 
     // removes game from cache if it contains tags matching thisGame
-    // making sure its weight is recalculated later
-    private void recache(Game thisGame) 
+    public void recache(Game thisGame) 
     {
         Iterator<Game> iter = cache.keySet().iterator();
 
@@ -42,53 +36,12 @@ public class GameSearch extends Thread {
         }
     }
 
-    // search and present games
-    @Override
-    public void run () 
+    public void clearCache() 
     {
-        UserData tempUserData = new UserData(postUserData);
-
-        Game GameToPresent = null;
-
-        while (true) // algorithm runs until exit condition met
-        {
-            // choose next best game from source
-            GameToPresent = ChooseNext(tempUserData, GameToPresent);
-
-            // remove this game
-            GameToPresent.RemoveGame();
-
-            // present this game
-            IOController.PresentGameToUser(GameToPresent);
-
-            // read input state
-            switch (IOController.getState()) {
-                case IOController.EXIT:
-                    GameSearch.EXIT(GameToPresent); 
-                case IOController.LIKE:
-                    iteration = 0;  
-                    tempUserData.addGame(GameToPresent); 
-                    recache(GameToPresent); // removes games that need to be recalculated
-                    GameToPresent = null;
-            }
-
-            // reset io state
-            IOController.resetState();
-
-            // if user has said no to too many games, 
-            // clear out array and restart searching
-            if (iteration > MAX_DISLIKES) {
-                IOController.MESSAGE("Revising search algorithm");
-                postUserData.removeSomeGames();
-                cache.clear();
-                run();
-            } else {
-                iteration++;
-            }
-        }
+        cache.clear();
     }
 
-    private Game ChooseNext (UserData tempUserData, Game lastGame)     // chooses next game from the database by tag matches to user games 
+    public Game ChooseNext (UserData tempUserData, Game lastGame)     // chooses next game from the database by tag matches to user games 
     {
         // if user data is empty then return random game
         if (tempUserData.getGames().isEmpty()) {
@@ -106,7 +59,7 @@ public class GameSearch extends Thread {
 
             long currWeight = 0;
 
-            if (thisGame.similarTo(lastGame) || thisGame.IsRemoved() || this.preUserData.getGames().containsKey(thisGame.getGameID())) { 
+            if (thisGame.similarTo(lastGame) || thisGame.IsRemoved() || this.UserData.getGames().containsKey(thisGame.getGameID())) { 
                 continue; // prevents returning owned or removed games
             } 
             
@@ -165,6 +118,9 @@ public class GameSearch extends Thread {
         // data base so throw an error and exit program
         if (nextGame == null) {
             EXIT("NO MORE GAMES IN DATABASE!");
+        } else {
+            // remove this game
+            nextGame.RemoveGame();
         }
 
         return nextGame;
@@ -195,6 +151,6 @@ public class GameSearch extends Thread {
             System.out.println(game.getName());
         }
 
-        NewGraph.start();
+        System.out.println(NewGraph.ChooseNext(UserData, null).getName());
     }
 }

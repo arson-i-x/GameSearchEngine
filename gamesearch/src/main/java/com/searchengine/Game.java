@@ -96,47 +96,47 @@ public class Game {
         return removed;
     }
     
-    long getGameID () 
+    public long getGameID () 
     {
         return gameID;
     }
 
-    String getName() 
+    public String getName() 
     {
         return name;
     }
 
-    int getReviewScore () 
+    public int getReviewScore () 
     {
         return reviewRatio;
     }
 
-    int getPopularity () 
+    public int getPopularity () 
     {
         return reviewCount;
     }
 
-    int getPrice () 
+    public int getPrice () 
     {
         return price;
     }
 
-    String getPriceString () 
+    public String getPriceString () 
     {
         return priceString;
     }
     
-    ReleaseDate getReleaseDate () 
+    public ReleaseDate getReleaseDate () 
     {
         return date;
     }
 
-    String getURL() 
+    public String getURL() 
     {
         return URL;
     }
 
-    Set<String> getTags() 
+    public Set<String> getTags() 
     {
         return tags;
     }

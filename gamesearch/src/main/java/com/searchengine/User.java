@@ -4,6 +4,8 @@ import com.lukaspradel.steamapi.core.exception.SteamApiException;
 import com.lukaspradel.steamapi.data.json.ownedgames.GetOwnedGames;
 import com.lukaspradel.steamapi.webapi.client.SteamWebApiClient;
 import com.lukaspradel.steamapi.webapi.request.GetOwnedGamesRequest;
+
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
@@ -12,12 +14,19 @@ import java.util.Set;
 public class User {
     // get Steam client from GameSearchAppplication Instance
     private static final SteamWebApiClient client = GameSearchApplication.SteamClient;
-    private static String steamID;
-    private static UserData userdata;
-    private static boolean loginsuccess;
+    private UserData userdata;
+    private boolean loginsuccess;
+
+    public User(UserData userData)  
+    {
+        this.userdata = userData;
+        if (!userData.getGames().isEmpty()) {
+            loginsuccess = true;
+        }
+    }
 
     // takes ID or game name as input and creates associated userdata
-    public static void Login (String steamID) throws SteamApiException {
+    public static User Login (String steamID) throws SteamApiException, IOException {
         Object ID = IOController.LoginQuery(steamID);
         if (ID instanceof Long) {
             steamID = ID.toString();
@@ -26,33 +35,26 @@ public class User {
             HashMap<Long, Long> gameIDList = new HashMap<>();
             List<com.lukaspradel.steamapi.data.json.ownedgames.Game> gameList = games.getResponse().getGames();
             for (com.lukaspradel.steamapi.data.json.ownedgames.Game game : gameList) {
-                loginsuccess = true;
                 //System.out.println(game.getAppid());
                 gameIDList.put(game.getAppid(), game.getPlaytimeForever()); // Brandon - Also hashes user playtime
             }
-            userdata = UserData.CreateUserData(gameIDList);
+            return new User(UserData.CreateUserData(gameIDList));
         } else {
-            loginsuccess = true;
-            userdata = UserData.CreateUserData(ID.toString());
+            throw new IOException();
         }
     }
 
-    static void setLoginSuccess (boolean state) 
+    void setLoginSuccess (boolean state) 
     {
         loginsuccess = state;
     }
 
-    static boolean getLoginSuccess () 
+    boolean getLoginSuccess () 
     {
         return loginsuccess;
     }
 
-    static void fakeUser () 
-    {
-        userdata = new UserData();
-    }
-
-    static UserData getUserData () 
+    public UserData getUserData () 
     {
         if (userdata == null) {
             GameSearch.EXIT("NO USER DATA FOUND");
@@ -60,7 +62,7 @@ public class User {
         return userdata;
     }
 
-    static Set<Long> getGames()
+    Set<Long> getGames()
     {   
         return userdata.getGames().keySet();
     }

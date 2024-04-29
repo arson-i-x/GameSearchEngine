@@ -3,6 +3,34 @@
   "configurations": [
     {
       "type": "java",
+      "name": "GUI",
+      "request": "launch",
+      "mainClass": "UI.GUI",
+      "projectName": "gamesearchengine"
+    },
+    {
+      "type": "java",
+      "name": "WINDOW",
+      "request": "launch",
+      "mainClass": "UI.WINDOW",
+      "projectName": "gamesearchengine"
+    },
+    {
+      "type": "java",
+      "name": "TerminalApplication",
+      "request": "launch",
+      "mainClass": "com.searchengine.TerminalApplication",
+      "projectName": "gamesearchengine"
+    },
+    {
+      "type": "java",
+      "name": "GameSearchApplication",
+      "request": "launch",
+      "mainClass": "com.searchengine.GameSearchApplication",
+      "projectName": "gamesearchengine"
+    },
+    {
+      "type": "java",
       "name": "IOController",
       "request": "launch",
       "mainClass": "com.searchengine.IOController",
