@@ -53,7 +53,7 @@ public class LoginWindow extends WINDOW implements Initializable {
             JOptionPane.showMessageDialog(null,"API ERROR: ENSURE ID IS CORRECT");
             steamIDInput.clear();
         } catch (IOException io) {
-            JOptionPane.showMessageDialog(null,"PLEASE ENTER YOUR STEAM ID" + "\n" + io.getMessage());
+            JOptionPane.showMessageDialog(null,"PLEASE ENTER YOUR STEAM ID");
             steamIDInput.clear();
         }
     }

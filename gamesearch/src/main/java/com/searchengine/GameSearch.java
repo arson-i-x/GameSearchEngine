@@ -11,6 +11,12 @@ public class GameSearch {
     public UserData UserData;  // holds users games
     private Map<Game, Long> cache; // holds weight of games already calculated
 
+    public GameSearch () // Searches a game database using Userdata as input
+    {
+        this.UserData = new UserData();
+        this.cache = new LinkedHashMap<>();
+    }
+
     public GameSearch (UserData data) // Searches a game database using Userdata as input
     {
         this.UserData = data;
@@ -85,7 +91,7 @@ public class GameSearch {
             }
 
             // check each user game and compare its tags to this game by tag weights (hours played)
-            for (Long SourceID: tempUserData.getGames().keySet()) {
+            /*for (Long SourceID: tempUserData.getGames().keySet()) {
                
                 Game Source = Database.getGame(SourceID);
                 
@@ -97,6 +103,15 @@ public class GameSearch {
                     } else {
                         currWeight-= tempUserData.getTagWeight(tag); 
                     }
+                }
+            }*/
+
+            // faster method to search, less deterministic
+            for (String tag : UserData.getTags().keySet()) {
+                if (thisGame.getTags().contains(tag)) {
+                    currWeight+= tempUserData.getTagWeight(tag);  
+                } else {
+                    currWeight-= tempUserData.getTagWeight(tag); 
                 }
             }
 

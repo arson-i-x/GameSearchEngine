@@ -23,12 +23,10 @@ public class TerminalApplication extends GameSearchApplication {
 
         String id = IOController.getTerminalInput();
 
-        User newUser = new User(new UserData());
-
         // user login
         try {
-            newUser = User.Login(id);
-            if (!newUser.getLoginSuccess()) {
+            user = User.Login(id);
+            if (!user.getLoginSuccess()) {
                 IOController.putTerminalOutput("Make sure your Steam Library is set to public.");
             }
         } catch (SteamApiException steamApiException) {
@@ -37,9 +35,7 @@ public class TerminalApplication extends GameSearchApplication {
         } catch (IOException re) {
             IOController.putTerminalOutput("PLEASE ENTER A STEAM ID");
         } finally {
-            User user = newUser;
-            this.userData = user.getUserData();
-            SearchInstance = new GameSearch(this.userData);
+            SearchInstance = new GameSearch(user.getUserData());
         }
     }
 

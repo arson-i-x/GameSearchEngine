@@ -16,7 +16,7 @@ public class GameSearchApplication {
                                         ("CF994D1D2070B5344BF6DF7337BDB2AB").build();
 
     protected GameSearch SearchInstance;
-    protected UserData userData;
+    protected User user;
     protected int iteration;
     protected Game GameToPresent;
 
@@ -24,14 +24,14 @@ public class GameSearchApplication {
     {
         Database.init();
         this.iteration = 0;
-        this.userData = new UserData();
-        this.SearchInstance = new GameSearch(userData);
+        this.SearchInstance = new GameSearch();
     }
 
     public void BuildUserSearch (String steamID) throws IOException, SteamApiException
     {
         this.iteration = 0;
-        this.SearchInstance.setUserData(User.Login(steamID).getUserData());
+        this.user = User.Login(steamID);
+        this.SearchInstance.setUserData(new UserData(user.getUserData()));
     }
 
     public Game nextGame() 
@@ -70,7 +70,7 @@ public class GameSearchApplication {
 
     public UserData getUserData() 
     {
-        return userData;
+        return user.getUserData();
     }
     
     public static void main (String[] args)     // tests application through terminal input and returns best game
