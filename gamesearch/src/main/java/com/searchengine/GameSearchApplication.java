@@ -1,16 +1,10 @@
 package com.searchengine;
 
 import java.io.IOException;
-import java.util.Locale;
-
 import javax.swing.JOptionPane;
-
 import com.lukaspradel.steamapi.core.exception.SteamApiException;
 import com.lukaspradel.steamapi.webapi.client.SteamWebApiClient;
-import UI.*;
-import javafx.application.Application;
 import javafx.application.Platform;
-import javafx.stage.Stage;
 
 public class GameSearchApplication {
 
@@ -22,23 +16,22 @@ public class GameSearchApplication {
                                         ("CF994D1D2070B5344BF6DF7337BDB2AB").build();
 
     protected GameSearch SearchInstance;
-    protected UserData userData;
+    protected User user;
     protected int iteration;
-    protected UserData workingData;
     protected Game GameToPresent;
 
     public GameSearchApplication()
     {
         Database.init();
-        this.iteration = -1;
+        this.iteration = 0;
+        this.SearchInstance = new GameSearch();
     }
 
     public void BuildUserSearch (String steamID) throws IOException, SteamApiException
     {
         this.iteration = 0;
-        this.userData = User.Login(steamID).getUserData();
-        this.SearchInstance = new GameSearch(this.userData);
-        this.workingData = new UserData(this.userData);
+        this.user = User.Login(steamID);
+        this.SearchInstance.setUserData(new UserData(user.getUserData()));
     }
 
     public Game nextGame() 
@@ -54,12 +47,12 @@ public class GameSearchApplication {
         // clear out array and restart searching
         if (iteration > MAX_DISLIKES) {
             JOptionPane.showMessageDialog(null,"REVISING SEARCH");
-            workingData.removeSomeGames();
+            SearchInstance.getUserData().removeSomeGames();
             SearchInstance.clearCache();
         } 
 
         // choose next best game from source
-        return SearchInstance.ChooseNext(workingData, GameToPresent);
+        return SearchInstance.ChooseNext(SearchInstance.getUserData(), GameToPresent);
     }
 
     public void download() 
@@ -70,14 +63,14 @@ public class GameSearchApplication {
     public void like(Game game) 
     {
         iteration = 0;  
-        workingData.addGame(game); 
+        SearchInstance.getUserData().addGame(game); 
         SearchInstance.recache(game); // removes games that need to be recalculated
-        GameToPresent = null;
+        GameToPresent = null;  // Set last game to null so similar games will show up
     }
 
     public UserData getUserData() 
     {
-        return userData;
+        return user.getUserData();
     }
     
     public static void main (String[] args)     // tests application through terminal input and returns best game

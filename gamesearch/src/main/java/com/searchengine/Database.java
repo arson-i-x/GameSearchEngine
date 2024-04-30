@@ -33,7 +33,7 @@ final public class Database {
         return GameTable.get(id);
     }
 
-    static List<Game> getAllGames() // gets all game object in the database 
+    public static List<Game> getAllGames() // gets all game object in the database
     {
         List<Game> games = new LinkedList<>((GameTable.values().stream()).toList());
         Collections.shuffle(games); // Shuffles gamelist on each call
@@ -65,10 +65,10 @@ final public class Database {
             String name = record.get("Title");                             
             int upperRatio = FuzzySearch.ratio(name.toUpperCase(), UpperName);  // uses fuzzy search to store a best ratio match
             int lowerRatio = FuzzySearch.ratio(name.toLowerCase(), LowerName);  // and corrected version of the name
-            if (upperRatio > bestRatio && upperRatio > 50 && upperRatio > lowerRatio) { // higher ratio means better match
+            if (upperRatio > bestRatio && upperRatio > 85 && upperRatio > lowerRatio) { // higher ratio means better match
                 bestRatio = upperRatio;
                 bestGameID = Integer.parseInt(record.get("App ID"));
-            } else if (lowerRatio > bestRatio && lowerRatio > 50) { // if lower is better than upper it is choosen
+            } else if (lowerRatio > bestRatio && lowerRatio > 85) { // if lower is better than upper it is choosen
                 bestRatio = lowerRatio;
                 bestGameID = Integer.parseInt(record.get("App ID"));
             }

@@ -1,52 +1,6 @@
-//import javax.swing.*;
-//import java.awt.event.ActionEvent;
-//import java.awt.event.ActionListener;
-//
-//public class SearchApp extends JFrame{
-//    private JPanel LoginPanel;
-//    private JLabel LoginLabel;
-//    private JButton yesButton;
-//    private JButton noButton;
-//
-//    public SearchApp(){
-//        setTitle("CS310 Project");
-//        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-//        setSize(500,500);
-//        setLocationRelativeTo(null);
-//        setVisible(true);
-//        setContentPane(LoginPanel);
-//
-//        //com.searchengine.GameSearchApplication.BuildUserSearch().GameSearch();
-//
-//        yesButton.addActionListener(new ActionListener() {
-//            @Override
-//            public void actionPerformed(ActionEvent e) {
-//                if (e.getSource() == yesButton){
-//                    dispose();
-//                    IDSearchApp loginWindow = new IDSearchApp();
-//                }
-//            }
-//        });
-//        noButton.addActionListener(new ActionListener() {
-//            @Override
-//            public void actionPerformed(ActionEvent e) {
-//                if (e.getSource() == noButton){
-//                    dispose();
-//                    NoButtonSearchApp noSearchApp = new NoButtonSearchApp();
-//                }
-//            }
-//        });
-//    }
-//
-//    public static void main(String[] args) {
-//        new SearchApp();
-//    }
-//}
-
 package UI;
 
 import javax.swing.JOptionPane;
-
 import com.searchengine.*;
 import javafx.application.Application;
 import javafx.scene.Scene;
@@ -88,14 +42,8 @@ public class SearchApp extends Application
     }
 
     public static void display(WINDOW window) {
-        try {
-            Stage source = (Stage) stage.getScene().getWindow();
-            source.setScene(new Scene(window.getRoot()));
-        } catch (NullPointerException e) {
-            System.out.println("NULL SCENE");
-            e.printStackTrace();
-            System.exit(1);
-        }
+        Stage source = (Stage) stage.getScene().getWindow();
+        source.setScene(new Scene(window.getRoot()));
     }
 
     public static GameSearchApplication getSearchInstance() 
