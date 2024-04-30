@@ -33,7 +33,7 @@ final public class Database {
         return GameTable.get(id);
     }
 
-    static List<Game> getAllGames() // gets all game object in the database 
+    public static List<Game> getAllGames() // gets all game object in the database
     {
         List<Game> games = new LinkedList<>((GameTable.values().stream()).toList());
         Collections.shuffle(games); // Shuffles gamelist on each call
