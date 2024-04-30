@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.layout.AnchorPane?>
@@ -8,30 +9,36 @@
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.web.WebView?>
 
-<AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="UI.GameWindow">
+<AnchorPane prefHeight="720.0" prefWidth="1280.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="UI.GameWindow">
    <children>
-      <GridPane layoutX="5.0" prefWidth="679.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="0.0">
+      <GridPane layoutX="-212.0" prefHeight="611.0" prefWidth="840.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="1.0" AnchorPane.rightAnchor="1.0" AnchorPane.topAnchor="0.0">
          <columnConstraints>
-            <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-            <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-            <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-            <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-            <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+            <ColumnConstraints maxWidth="88.0" minWidth="0.0" prefWidth="0.0" />
+            <ColumnConstraints hgrow="SOMETIMES" maxWidth="100.0" minWidth="0.0" prefWidth="0.0" />
+            <ColumnConstraints hgrow="SOMETIMES" maxWidth="200.0" minWidth="0.0" prefWidth="0.0" />
+            <ColumnConstraints hgrow="SOMETIMES" maxWidth="1278.0" minWidth="10.0" prefWidth="1278.0" />
+            <ColumnConstraints hgrow="SOMETIMES" maxWidth="200.0" minWidth="0.0" prefWidth="0.0" />
+            <ColumnConstraints hgrow="SOMETIMES" maxWidth="95.0" minWidth="0.0" prefWidth="0.0" />
          </columnConstraints>
          <rowConstraints>
             <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+            <RowConstraints maxHeight="24.0" minHeight="0.0" prefHeight="0.0" vgrow="SOMETIMES" />
+            <RowConstraints maxHeight="660.0" minHeight="10.0" prefHeight="660.0" vgrow="SOMETIMES" />
+            <RowConstraints maxHeight="25.0" minHeight="0.0" prefHeight="0.0" vgrow="SOMETIMES" />
             <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
          </rowConstraints>
          <children>
-            <Button fx:id="likeButton" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#onLike" prefHeight="25.0" prefWidth="140.0" text="LIKE" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.hgrow="NEVER" GridPane.rowIndex="4" GridPane.vgrow="NEVER" />
-            <Button fx:id="downloadButton" maxHeight="-Infinity" maxWidth="-Infinity" mnemonicParsing="false" onAction="#onDownload" prefHeight="25.0" prefWidth="217.0" text="DOWNLOAD" GridPane.halignment="CENTER" GridPane.rowIndex="4" />
-            <Label alignment="CENTER" maxWidth="1.7976931348623157E308" text="Your game is" GridPane.columnSpan="2147483647" />
-            <Button fx:id="nextButton" mnemonicParsing="false" onAction="#onNext" prefHeight="25.0" prefWidth="138.0" text="NEXT" GridPane.columnIndex="4" GridPane.halignment="CENTER" GridPane.rowIndex="4" />
+            <Button fx:id="likeButton" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#onLike" prefHeight="25.0" prefWidth="406.0" text="LIKE" GridPane.columnIndex="3" GridPane.halignment="CENTER" GridPane.hgrow="NEVER" GridPane.rowIndex="4" GridPane.vgrow="NEVER" />
+            <Button fx:id="downloadButton" maxHeight="-Infinity" maxWidth="-Infinity" mnemonicParsing="false" onAction="#onDownload" prefHeight="25.0" prefWidth="371.0" text="EXIT" GridPane.columnIndex="3" GridPane.halignment="LEFT" GridPane.rowIndex="4" />
+            <Label alignment="CENTER" maxWidth="1.7976931348623157E308" text="YOUR GAME IS" GridPane.columnIndex="1" GridPane.columnSpan="2147483647" />
+            <Button fx:id="nextButton" mnemonicParsing="false" onAction="#onNext" prefHeight="25.0" prefWidth="364.0" text="NEXT" GridPane.columnIndex="3" GridPane.halignment="RIGHT" GridPane.rowIndex="4" />
+            <WebView fx:id="view" prefWidth="994.0" GridPane.columnIndex="3" GridPane.hgrow="ALWAYS" GridPane.rowIndex="2" GridPane.vgrow="ALWAYS">
+               <GridPane.margin>
+                  <Insets />
+               </GridPane.margin>
+            </WebView>
          </children>
       </GridPane>
-      <WebView fx:id="view" layoutY="60.0" prefHeight="276.0" prefWidth="633.0" />
+      <Label fx:id="time" prefHeight="33.0" prefWidth="381.0" />
    </children>
 </AnchorPane>

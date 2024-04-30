@@ -2,6 +2,8 @@ package com.searchengine;
 
 import java.util.*;
 
+import javax.naming.NameNotFoundException;
+
 public class UserData {
 
     private HashMap<Long, Long> UserGames;        // These should be kept separate for weighting by hours played
@@ -69,7 +71,21 @@ public class UserData {
         return userData;
     }
 
-    void addGame (Game game, long hoursPlayed) // adds a game with specific amt of hours
+    // add game to library by querying database. returns the games URL
+    public String addGame(String query) throws NameNotFoundException
+    {   
+        Game game = Database.query(query);
+                
+        if (game == null) { 
+            throw new NameNotFoundException(); 
+        }
+
+        this.addGame(game);    
+
+        return game.getURL();
+    }
+
+    public void addGame (Game game, long hoursPlayed) // adds a game with specific amt of hours
     {
         UserGames.put(game.getGameID(), hoursPlayed);
         hoursPlayedTotal += hoursPlayed;
@@ -85,7 +101,7 @@ public class UserData {
         IOController.GameAdded(game);
     }  
 
-    void addGame (Game game) // adds a game with avg amt of hours
+    public void addGame (Game game) // adds a game with avg amt of hours
     {
         long hoursPlayed = UserGames.size() != 0 ? getAveragePlaytime() : 100;
         hoursPlayedTotal += hoursPlayed;

@@ -6,22 +6,28 @@ import java.util.*;
 public class GameSearch {
 
     // how many times the algorithm will loop also controls accuracy of matches
-    // TODO balance cache use with MAX_ITERATIONS to find optimal accuracy
-    private static final int MAX_ITERATIONS = 10000; 
+    private static final int MAX_ITERATIONS = Database.size(); 
     
     public UserData UserData;  // holds users games
     private Map<Game, Long> cache; // holds weight of games already calculated
-    private int iteration;
 
     public GameSearch (UserData data) // Searches a game database using Userdata as input
     {
         this.UserData = data;
         this.cache = new LinkedHashMap<>();
-        this.iteration = 0;
     }
 
-    // removes game from cache if it contains tags matching thisGame
-    public void recache(Game thisGame) 
+    public UserData getUserData() 
+    {
+        return this.UserData;
+    }
+
+    public void setUserData(UserData data) 
+    {
+        this.UserData = data;
+    }
+
+    public void recache(Game thisGame)     // removes game from cache if it contains tags matching thisGame 
     {
         Iterator<Game> iter = cache.keySet().iterator();
 
@@ -36,12 +42,12 @@ public class GameSearch {
         }
     }
 
-    public void clearCache() 
+    public void clearCache() // removes all games from cache
     {
         cache.clear();
     }
 
-    public Game ChooseNext (UserData tempUserData, Game lastGame)     // chooses next game from the database by tag matches to user games 
+    public Game ChooseNext (UserData tempUserData, Game lastGame) // chooses next game from the database by tag matches to user games 
     {
         // if user data is empty then return random game
         if (tempUserData.getGames().isEmpty()) {
@@ -64,7 +70,7 @@ public class GameSearch {
             } 
             
             if (nextGame != null && (nextGame.getPopularity() > thisGame.getPopularity() && nextGame.getReviewScore() > thisGame.getReviewScore())) {  
-                continue; // if nextGame got better reviews and is more popular than thisGame then skip thisGame                                            
+                //continue; // if nextGame got better reviews and is more popular than thisGame then skip thisGame  TODO SKIP??                                          
             }
 
             // CHECK CACHE FOR WEIGHT BEFORE CALCULATING ANYTHING ELSE

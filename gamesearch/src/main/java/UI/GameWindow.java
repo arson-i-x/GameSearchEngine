@@ -4,8 +4,11 @@ import java.net.URL;
 import java.util.ResourceBundle;
 
 import com.searchengine.Game;
+
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.control.Label;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
 
@@ -13,25 +16,29 @@ public class GameWindow extends WINDOW implements Initializable {
 
     @FXML
     private WebView view;
-    private String testLink = "http://google.com";
     private WebEngine engine;
     private static Game game;
+    private static Long timecalc;
+    
+    @FXML
+    private Label time;
 
     public GameWindow() 
     {
         open("GameWindow.fxml");
     }
 
-    public static GameWindow presentGame(Game game) 
+    public static GameWindow presentGame(Game game, Long timecalc) 
     {
         GameWindow newWindow = new GameWindow();
-        newWindow.loadGame(game);
+        newWindow.loadGame(game, timecalc);
         return newWindow;
     }
 
-    public void loadGame(Game newgame) 
+    public void loadGame(Game newgame, Long time) 
     {
         game = newgame;
+        timecalc = time;
         System.out.println(game.getName() + " is your game.");
     }
 
@@ -43,7 +50,7 @@ public class GameWindow extends WINDOW implements Initializable {
     @FXML
     public void onDownload()
     {
-        SearchApp.display(new DownloadWindow(game));
+        Platform.exit();
     }
 
     @FXML
@@ -57,7 +64,10 @@ public class GameWindow extends WINDOW implements Initializable {
     public void onNext() 
     {
         GameWindow newGameWindow = new GameWindow();
-        newGameWindow.loadGame(SearchApp.getSearchInstance().nextGame());
+        long startTime = System.nanoTime();
+        Game game = SearchApp.getSearchInstance().nextGame();
+        long stopTime = System.nanoTime();
+        newGameWindow.loadGame(game, stopTime - startTime);
         SearchApp.display(newGameWindow);
     }
 
@@ -65,5 +75,6 @@ public class GameWindow extends WINDOW implements Initializable {
     public void initialize(URL url, ResourceBundle bundle) {
         engine = view.getEngine();
         engine.load(game.getURL());
+        time.setText(timecalc.toString());
     }
 }

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<launch4jConfig>
+  <dontWrapJar>false</dontWrapJar>
+  <headerType>gui</headerType>
+  <jar>C:\Users\darka\OneDrive\Desktop\repo clones\final\GameSearchEngine\GameSearchEngine.jar</jar>
+  <outfile>C:\Users\darka\OneDrive\Desktop\repo clones\final\GameSearchEngine\out\dist.exe</outfile>
+  <errTitle></errTitle>
+  <cmdLine></cmdLine>
+  <chdir>.</chdir>
+  <priority>normal</priority>
+  <downloadUrl></downloadUrl>
+  <supportUrl></supportUrl>
+  <stayAlive>false</stayAlive>
+  <restartOnCrash>true</restartOnCrash>
+  <manifest></manifest>
+  <icon></icon>
+  <jre>
+    <path>C:\Program Files\Java\jre-1.8</path>
+    <requiresJdk>false</requiresJdk>
+    <requires64Bit>true</requires64Bit>
+    <minVersion>1.7</minVersion>
+    <maxVersion>1.9</maxVersion>
+  </jre>
+</launch4jConfig>

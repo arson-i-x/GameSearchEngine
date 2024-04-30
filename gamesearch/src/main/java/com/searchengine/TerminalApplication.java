@@ -40,7 +40,6 @@ public class TerminalApplication extends GameSearchApplication {
             User user = newUser;
             this.userData = user.getUserData();
             SearchInstance = new GameSearch(this.userData);
-            workingData = new UserData(this.userData);
         }
     }
 
@@ -51,7 +50,7 @@ public class TerminalApplication extends GameSearchApplication {
         while (true) // algorithm runs until exit condition met
         {
             // choose next best game from source
-            GameToPresent = SearchInstance.ChooseNext(workingData, GameToPresent);
+            GameToPresent = SearchInstance.ChooseNext(SearchInstance.getUserData(), GameToPresent);
 
             // remove this game
             GameToPresent.RemoveGame();
@@ -65,7 +64,7 @@ public class TerminalApplication extends GameSearchApplication {
                     GameSearch.EXIT(GameToPresent); 
                 case IOController.LIKE:
                     iteration = 0;  
-                    workingData.addGame(GameToPresent); 
+                    SearchInstance.getUserData().addGame(GameToPresent); 
                     SearchInstance.recache(GameToPresent); // removes games that need to be recalculated
                     GameToPresent = null;
             }
@@ -77,7 +76,7 @@ public class TerminalApplication extends GameSearchApplication {
             // clear out array and restart searching
             if (iteration > MAX_DISLIKES) {
                 IOController.MESSAGE("Revising search algorithm");
-                workingData.removeSomeGames();
+                SearchInstance.getUserData().removeSomeGames();
                 SearchInstance.clearCache();
                 runInTerminal();
             } else {
