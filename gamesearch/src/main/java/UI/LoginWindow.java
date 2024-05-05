@@ -5,8 +5,6 @@ import java.net.URL;
 import java.util.ResourceBundle;
 import javax.swing.JOptionPane;
 import com.lukaspradel.steamapi.core.exception.SteamApiException;
-import com.searchengine.Game;
-
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.TextField;
@@ -14,10 +12,7 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 
 public class LoginWindow extends WINDOW implements Initializable {
-
-    private final String imagePath = (WINDOW.class.getResource("helpImage.jpg").toString());
-
-    private final Image helpImage = new Image(imagePath);
+    private final Image helpImage = new Image(WINDOW.class.getResourceAsStream("helpimage.jpg"));
 
     @FXML
     TextField steamIDInput;
@@ -31,29 +26,22 @@ public class LoginWindow extends WINDOW implements Initializable {
     }
 
     @FXML
+    public void backButton() 
+    {
+        SearchApp.display(new MainWindow());
+    }
+
+    @FXML
     public void onLogin() 
     {
         try {
-            // builds userdata from steamid
-            SearchApp.getSearchInstance().BuildUserSearch(steamIDInput.getText());
-
-            // tells user library is private but does not exit
-            if (SearchApp.getSearchInstance().getUserData().isEmpty()) {
-                JOptionPane.showMessageDialog(null,"Please set Steam Library to public.");
-            }
-            
-            // loads first game into window and displays it
-
-            Game GameToPresent = SearchApp.getSearchInstance().nextGame();
-            
-            SearchApp.display(GameWindow.presentGame(GameToPresent, (long)1));
-            
-
+            SearchApp.getSearchInstance().login(steamIDInput.getText());   // builds userdata from steamid
+            SearchApp.display(new GameWindow());
         } catch (SteamApiException sae) {
-            JOptionPane.showMessageDialog(null,"API ERROR: ENSURE ID IS CORRECT");
-            steamIDInput.clear();
+            JOptionPane.showMessageDialog(null,sae.getMessage());
         } catch (IOException io) {
-            JOptionPane.showMessageDialog(null,"PLEASE ENTER YOUR STEAM ID");
+            JOptionPane.showMessageDialog(null,io.getMessage());
+        } finally {
             steamIDInput.clear();
         }
     }

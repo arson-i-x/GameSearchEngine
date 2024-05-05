@@ -1,131 +1,94 @@
 package com.searchengine;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.util.*;
-
 import javax.naming.NameNotFoundException;
 
-public class UserData {
-
-    private HashMap<Long, Long> UserGames;        // These should be kept separate for weighting by hours played
-    private HashMap<String, Long> UserTags; 
+public class UserData implements Serializable {
+    private static final File userdataFile = new File("gamesearch/src/main/resources/userdata.ser");
+    private HashMap<Long,Long> UserGames;  // stores game ids/hours played of game
+    private HashMap<String, Long> tags;
     private long hoursPlayedTotal;
 
     // empty userdata constructor
     public UserData () 
     {
         this.UserGames = new HashMap<>(); 
-        this.UserTags = new HashMap<>();
+        this.tags = new HashMap<>();
         hoursPlayedTotal = 0;
     }
 
     public UserData (UserData data) 
     {
         this.UserGames = new HashMap<>(data.getGames());
-        this.UserTags = new HashMap<>(data.getTags());
+        this.tags = new HashMap<>(data.getTags());
         this.hoursPlayedTotal = data.hoursPlayedTotal;
     }
 
-    // Creates game list by querying database
-    public static UserData CreateUserData (String query) 
-    {   
-        UserData UserData = new UserData();
-
-        // asks user for input and adds game if found
-        while (true) {
-
-            Game game = Database.query(query);
-            
-            // if game not found output error
-            if (game == null) { 
-                IOController.ERROR("GAME NOT FOUND"); 
-                query = IOController.UserQuery();
-                continue; 
-            }
-            if (game.getGameID() == -1) {  
-                break; 
-            }
-            UserData.addGame(game);
-            query = IOController.UserQuery();
-        }
-
-        return UserData;
-    }
-
-    // Creates userdata from id list
-    public static UserData CreateUserData (HashMap<Long, Long> idList) 
+    public static UserData CreateUserData (HashMap<Long, Long> idList) // Creates userdata from id list 
     {
         UserData userData = new UserData();
 
         for (Long gameid : idList.keySet()) {
-            Game game = Database.getGame(gameid);
+            Game game = Database.getGame(gameid.toString());
             if (game != null) {
                 long hoursPlayed = idList.get(gameid);
                 userData.addGame(game, hoursPlayed);
-                for (String tag : game.getTags()) {
-                    userData.UserTags.put(tag, (userData.UserTags.containsKey(tag)) ?       // hashes tag and hours played of the tag
-                                            (userData.UserTags.get(tag) + hoursPlayed) : 
-                                            (hoursPlayed));
-                }
             }   
         }
+        writeUserDataToFile(userData);
         return userData;
     }
 
-    // add game to library by querying database. returns the games URL
-    public String addGame(String query) throws NameNotFoundException
+    public void addGame(String query) throws RuntimeException // add game to library by querying database. returns the games URL
     {   
-        Game game = Database.query(query);
-                
-        if (game == null) { 
-            throw new NameNotFoundException(); 
+        try {
+            Game game = Database.query(query);
+            this.addGame(game, getAveragePlaytime());    
+            writeUserDataToFile(this);
+        } catch (NameNotFoundException e) {
+            throw new RuntimeException("GAME NOT FOUND");
         }
-
-        this.addGame(game);    
-
-        return game.getURL();
     }
 
     public void addGame (Game game, long hoursPlayed) // adds a game with specific amt of hours
     {
         UserGames.put(game.getGameID(), hoursPlayed);
+        hoursPlayed = Math.abs(hoursPlayed);
         hoursPlayedTotal += hoursPlayed;
-       
-        game.getTags().forEach(tag -> {
-            UserTags.put(tag, getTagWeight(tag) != null ? 
-                        getTagWeight(tag) + hoursPlayedTotal 
-                        : 
-                        hoursPlayedTotal);
-                        //IOController.MESSAGE(tag + " weight is " + getTagWeight(tag));
-        });
+        writeUserDataToFile(this);
+        Log.GameAdded(game, this);
+    }   
 
-        IOController.GameAdded(game);
+    public void likeGame (Game game) // adds a game with avg amt of hours
+    {
+        Long hoursPlayed = getAveragePlaytime();
+        addGame(game, -hoursPlayed);
     }  
 
-    public void addGame (Game game) // adds a game with avg amt of hours
+    public HashMap<String, Long> getTags() 
     {
-        long hoursPlayed = UserGames.size() != 0 ? getAveragePlaytime() : 100;
-        hoursPlayedTotal += hoursPlayed;
-        UserGames.put(game.getGameID(), hoursPlayed);
-        addTags(game.getTags());
-        IOController.GameAdded(game);
-    }  
-
-    private void addTags(Set<String> tags) // simulates playtime based on current tag data
-    {
-        for (String tag : tags) {
-            if (UserTags.containsKey(tag)) {
-
-                IOController.MESSAGE("INCREASING " + tag + " WEIGHT " + getTagWeight(tag));
-                UserTags.put(tag, getTagWeight(tag) + getTagWeight(tag)/tags.size());
-                IOController.MESSAGE(" TO NEW WEIGHT" + getTagWeight(tag));
-            }
-            else {
-                
-                UserTags.put(tag, getAveragePlaytime());
-                IOController.MESSAGE("MAKING " + tag + " WEIGHT " + getTagWeight(tag));
+        HashMap<String, Long> tags = new HashMap<>();
+        for (Long gameid : UserGames.keySet()) {
+            Game game = Database.getGame(gameid.toString());
+            int rank = 0;
+            for (String tag : game.getTags()) {
+                rank++;
+                if (tags.containsKey(tag)) {
+                    tags.put(tag, tags.get(tag) + UserGames.get(gameid)/rank);
+                } else {
+                    tags.put(tag, UserGames.get(gameid)/rank);
+                }
             }
         }
-    }
+        return tags;
+    } 
 
     public boolean isEmpty() 
     {
@@ -139,7 +102,10 @@ public class UserData {
 
     public Long getAveragePlaytime () 
     {
-        return hoursPlayedTotal / UserGames.size();
+        if (UserGames.size() == 0) {
+            return (long)1000000000; 
+        }
+        return hoursPlayedTotal / (UserGames.size() - 1);
     }
 
     public HashMap<Long, Long> getGames()
@@ -147,49 +113,83 @@ public class UserData {
         return UserGames;
     }
 
-    public HashMap<String, Long> getTags() 
-    {
-        return UserTags;
-    }
-
-    public Long getTagWeight (String tag) 
-    {
-        return UserTags.get(tag);
-    }
-
     public void removeSomeGames () 
     {
         // sort tags by playtime
-        List<Map.Entry<String,Long>> sortedTags = new LinkedList<>(UserTags.entrySet().stream().sorted(Map.Entry.comparingByValue()).toList());
-
-        // make a list of tags and gameids to remove
-        List<String> tagsToRemove = new LinkedList<>();
-        List<Long> gamesToRemove = new LinkedList<>();
-        
-        // remove 1/3 of lowest tags 
-        for (int i = 0; i < UserTags.size()/3; i++) {
-            String tag = sortedTags.get(i).getKey();
-            tagsToRemove.add(tag);
-            UserTags.remove(tag);
-        }
-
-        // add games with tags to remove
-        for (long gameid : getGames().keySet()) {
-            for (String tag : Database.getGame(gameid).getTags()) {
-                if (tagsToRemove.contains(tag)) {
-                    gamesToRemove.add(gameid);
+        List<Long> sortedGames = new LinkedList<>(UserGames.keySet().stream().toList());
+        Collections.sort(sortedGames, new Comparator<Long>() {
+            @Override
+            public int compare(Long id1, Long id2) {
+                if (UserGames.get(id2) < UserGames.get(id1)) {
+                    return 1;
+                } else if (UserGames.get(id2) > UserGames.get(id1)) {
+                    return -1;
+                } else {
+                    return 0;
                 }
             }
+        });
+
+        for (Long id : sortedGames) {
+            Game game = Database.getGame(id.toString());
+            Log.MESSAGE(game.getName() + " hours played = " + this.UserGames.get(id)); //TODO
+        }
+        
+        // remove 1/3 of lowest played games 
+        for (int i = 0; i < UserGames.size()/3; i++) {
+            Game game = Database.getGame(sortedGames.get(i).toString());
+            Log.MESSAGE("REMOVING GAME " + game.getName());
+            UserGames.remove(game.getGameID());
         }
 
-        // removes games
-        for (long gameid : gamesToRemove) {
-            UserGames.remove(gameid);
-            IOController.MESSAGE(Database.getGame(gameid).getName() + " REMOVED FROM LIBRARY!!");
+        for (Long id : getGames().keySet()) {
+            Log.MESSAGE("Library contains: " + Database.getGame(id.toString()));
         }
+    }
+ 
+    private static void writeUserDataToFile(UserData data) 
+    {
+        try {
+            userdataFile.createNewFile();
+            FileOutputStream fileOut = new FileOutputStream(userdataFile);
+            ObjectOutputStream out = new ObjectOutputStream(fileOut);
+            out.writeObject(data);
+            out.close();
+            fileOut.close();
+            Log.MESSAGE("USERDATA SAVED TO FILE");
+        } catch (IOException i) {
+            Log.MESSAGE(i.getMessage());
+        }
+    }
 
-        for (long gameid : getGames().keySet()) {
-            IOController.MESSAGE(Database.getGame(gameid).getName());
+    public static UserData getUserDataFromFile () 
+    {
+        UserData data = null;
+        try {
+            userdataFile.createNewFile();
+            FileInputStream fileIn = new FileInputStream(userdataFile);
+            ObjectInputStream in = new ObjectInputStream(fileIn);
+            data = (UserData) in.readObject();
+            in.close();
+            fileIn.close();
+        } catch (IOException i) {
+            Log.MESSAGE("NO USERDATA FOUND, GENERATING FILE");
+            return new UserData();
+        } catch (ClassNotFoundException c) {
+            Log.MESSAGE("USERDATA CLASS NOT FOUND");
+            return new UserData();
         }
+        if (data == null) {
+            Log.MESSAGE("NO USERDATA FOUND, GENERATING FILE");
+            return new UserData();
+        } else {
+            Log.userdata(data);
+            return data;
+        }
+    }
+
+    public static void clearFile() 
+    {
+        userdataFile.delete();
     }
 }

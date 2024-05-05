@@ -7,8 +7,9 @@
 
 <AnchorPane prefWidth="610.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="UI.LoginWindow">
    <children>
-      <Button fx:id="submitIDButton" layoutX="637.0" layoutY="21.0" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#onLogin" prefHeight="58.0" prefWidth="220.0" text="Submit" />
-      <TextField fx:id="steamIDInput" layoutX="29.0" layoutY="35.0" maxWidth="-Infinity" prefHeight="31.0" prefWidth="579.0" promptText="Enter Your Steam ID Name" />
+      <Button fx:id="submitIDButton" layoutX="637.0" layoutY="21.0" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#onLogin" prefHeight="58.0" prefWidth="248.0" text="Submit" />
+      <TextField fx:id="steamIDInput" layoutX="60.0" layoutY="38.0" maxWidth="-Infinity" prefHeight="25.0" prefWidth="572.0" promptText="Enter Your Steam ID Name" />
       <ImageView fx:id="image" fitHeight="506.0" fitWidth="890.0" layoutY="86.0" pickOnBounds="true" preserveRatio="true" />
+      <Button fx:id="backButton" layoutX="3.0" layoutY="38.0" mnemonicParsing="false" onAction="#backButton" prefHeight="25.0" prefWidth="53.0" text="BACK" />
    </children>
 </AnchorPane>

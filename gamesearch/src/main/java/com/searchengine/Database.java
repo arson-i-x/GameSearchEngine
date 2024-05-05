@@ -2,87 +2,103 @@ package com.searchengine;
 
 import java.io.*;
 import java.util.*;
-
+import javax.naming.NameNotFoundException;
 import org.apache.commons.csv.*;
+
 import me.xdrop.fuzzywuzzy.FuzzySearch;
 
 final public class Database {
     
-    private static final List<CSVRecord> RecordList = new ArrayList<>();     // list of csv records in this database
-    private static final HashMap<Long, Game> GameTable = new LinkedHashMap<>();  // Hashmap of GameIDs and Game Objects
+    private static final Map<String, Game> GameTable = new LinkedHashMap<>();
 
     public static void init()  // constructs a database from default path 
     {
         parseCSV("gamesearch/src/main/resources/GameDataset.csv");
     }
 
-    static Game getRandomGame() // gets random game from table
+    public static Game getRandomGame() // gets random game from table
     {
-        Random rand = new Random();
-        int i = rand.nextInt(GameTable.size() - 1); 
-        return getAllGames().get(i);
+        return getAllGames().get(0);
     }
 
     public static int size () 
     {
-        return GameTable.size();
-    }
-
-    public static Game getGame(Long id)      // gets game with this ID from table
-    {
-        return GameTable.get(id);
+        return GameTable.size()/2;
     }
 
     public static List<Game> getAllGames() // gets all game object in the database
     {
-        List<Game> games = new LinkedList<>((GameTable.values().stream()).toList());
-        Collections.shuffle(games); // Shuffles gamelist on each call
-        return games;
+        //List<Game> games = new ArrayList<>(GameTable.values());
+        //Collections.shuffle(games); // Shuffles gamelist on each call
+        return new ArrayList<>(GameTable.values());
     }
 
-    static List<CSVRecord> getRecords()   // gets all records in the database 
+    public static Set<String> getAllNames()
     {
-        return RecordList;
+        return GameTable.keySet();
     }
 
-    static Game query(String GameName) // Query Database with name of game and return Game Object    {
+    public static Game getGame(String game)
     {
-        // if done searching return an empty game object
-        if (GameName.equals("-done") || GameName.equals("")) {
-            return new Game(null);
+        return GameTable.get(game);
+    }
+
+    public static Game query(String name) throws NameNotFoundException // Query Database with name of game and return Game Object
+    {
+        Game game = null;
+
+        // try finding the name directly
+        // if not found, fuzzysearch
+        if (GameTable.containsKey(name)) {
+            return GameTable.get(name);
         }
 
-        /* Method to use Game name and get misspellings */
+        // fuzzy search
+        game = fuzzyquery(name);
         
+        // if still not found
+        // throw error
+        if (game == null) {
+            throw new NameNotFoundException();
+        } else {
+            Log.MESSAGE("Name found: " + game.getName());
+            return game;
+        }
+    }
+
+    static Game fuzzyquery(String GameName) 
+    {
+        if (GameName.equals("-done") || GameName.equals("")) {
+            return new Game();
+        }
+
         // stores lowercase and uppercase version of user input
         String UpperName = GameName.toUpperCase();
         String LowerName = GameName.toLowerCase();
-        long bestGameID = -1;
+        Game bestGame = null;
         int bestRatio = 0;
         
         // check each record for the given name
-        for (CSVRecord record : RecordList) {                                   
-            String name = record.get("Title");                             
+        for (String name : Database.GameTable.keySet()) {                                                          
             int upperRatio = FuzzySearch.ratio(name.toUpperCase(), UpperName);  // uses fuzzy search to store a best ratio match
             int lowerRatio = FuzzySearch.ratio(name.toLowerCase(), LowerName);  // and corrected version of the name
             if (upperRatio > bestRatio && upperRatio > 85 && upperRatio > lowerRatio) { // higher ratio means better match
                 bestRatio = upperRatio;
-                bestGameID = Integer.parseInt(record.get("App ID"));
+                bestGame = Database.GameTable.get(name);
             } else if (lowerRatio > bestRatio && lowerRatio > 85) { // if lower is better than upper it is choosen
                 bestRatio = lowerRatio;
-                bestGameID = Integer.parseInt(record.get("App ID"));
+                bestGame = Database.GameTable.get(name);
             }
         }
 
-        // compare user input to names in table and return best match
-        return getGame(bestGameID);
+        return bestGame;
     }
 
     static void parseCSV(String path)   // parses a CSV file into database using given string path as input
     {
         // clears database for new entries
-        RecordList.clear();
         GameTable.clear();
+
         // Uses CSV library to parse records with header format
         try {   
             Reader in = new FileReader(path); 
@@ -103,51 +119,22 @@ final public class Database {
             boolean first = true;
             for (CSVRecord record : records) { // put records into database, skipping header
                 if (first) { first = false; continue; }
-                RecordList.add(record);
-                Game game = new Game(record);
-                GameTable.put(game.getGameID(), game);
+                putNewGame(record.get("Title"), record.get("App ID"), new Game(record));
             }
         } catch (IOException exception) {
-            GameSearch.EXIT(exception.getMessage());
+            Log.EXIT(exception.getMessage());
         }
     }
 
-    public static void main(String[] args)      // tests database structure. Use this to ensure filepath is set correctly
+    private static void putNewGame(String title, String id, Game game) 
+    {
+        GameTable.put(id, game);
+        GameTable.put(title, game);
+    }
+
+    public static void main(String[] args) // tests database structure. Use this to ensure filepath is set correctly
     {
         Database.init();
-        Map<Integer, Map.Entry<String, String>> map = new HashMap<>(); // Dennis - Created Map
-//        int[] appids = new int[5];
-//        String[] names = new String[5];
-//        String[] tags = new String[5];
-        int index = 0;
-        boolean first = true;
-        for (CSVRecord record : Database.RecordList) {
-            if (first) { first = false; continue; }
-//            appids[index] = Integer.parseInt(record.get("App ID"));
-//            names[index] = record.get("Title");
-//            tags[index] = record.get("Tags");
-            // Dennis - Put values into map
-            map.put(Integer.parseInt(record.get("App ID")), new AbstractMap.SimpleEntry<>(record.get("Title"), record.get("Tags")));
-            index++;
-            if (index == 5) {
-                break;
-            }
-        }
-
-//        index = 0;
-//        for (String taglist : tags) {
-//            //System.out.println(appids[index]);
-//            System.out.println(names[index]);
-//            String[] SplitTags = taglist.split(",");
-//            for (String tag : SplitTags) {
-//                System.out.print(tag + " ");
-//            }
-//            System.out.println("\n");
-//            index++;
-//        }
-        // Dennis - Print out values in map.
-        for (Map.Entry<Integer, Map.Entry<String, String>> entry : map.entrySet()) {
-            System.out.println("Game ID = " + entry.getKey() + "\nGame Name = " + entry.getValue().getKey() + "\nTags = " + entry.getValue().getValue());
-        }
+        Log.MESSAGE("DATABASE INITIALIZE: RANDOM GAME IS --> " + Database.getRandomGame().getName());
     }
 }
