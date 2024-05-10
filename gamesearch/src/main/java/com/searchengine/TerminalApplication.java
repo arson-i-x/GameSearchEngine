@@ -1,83 +1,125 @@
 package com.searchengine;
 
 import java.io.IOException;
-
+import java.io.PrintStream;
+import java.util.Scanner;
 import com.lukaspradel.steamapi.core.exception.SteamApiException;
 
+public class TerminalApplication extends GameSearch
+{
+    private static final Scanner inputScanner = new Scanner(System.in);
+    private static final PrintStream outputStream = new PrintStream(System.out);
 
-public class TerminalApplication extends GameSearchApplication {
-
-    // how many times user can say no
-    private static final int MAX_DISLIKES = 10;
-
-    public TerminalApplication() 
+    private TerminalApplication() 
     {
-        IOController.MESSAGE("Enter Steam ID or Search Games");
+        this.clearUserData();
+        putOutput("Enter Steam ID or Search Games");
         this.BuildUserSearchFromTerminal();
+    }
+
+    public static String getInput() 
+    {
+        return inputScanner.nextLine();
+    }
+
+    public static void putOutput(String output) 
+    {
+        outputStream.println(output);
     }
     
     public void BuildUserSearchFromTerminal ()
     {
-        // init database
+        // init gamesearch
         Database.init();
-
-        String id = IOController.getTerminalInput();
+        String id = getInput();
 
         // user login
         try {
-            user = User.Login(id);
-            if (!user.getLoginSuccess()) {
-                IOController.putTerminalOutput("Make sure your Steam Library is set to public.");
-            }
+            login(id);
         } catch (SteamApiException steamApiException) {
-            IOController.putTerminalOutput("STEAM API ERROR");
+            putOutput("STEAM API ERROR\nMAKE SURE LIBRARY IS SET TO PUBLIC");
             System.exit(1);
         } catch (IOException re) {
-            IOController.putTerminalOutput("PLEASE ENTER A STEAM ID");
-        } finally {
-            SearchInstance = new GameSearch(user.getUserData());
+            this.BuildUserSearchFromTerminal(id);
+        }
+    }
+
+    private void putGame(String input) 
+    {
+        try {
+            user.getUserData().addGame(input);   
+        } catch (RuntimeException e) {
+            putOutput(e.getMessage());
+            e.printStackTrace();
+        }  
+    }
+
+    public void BuildUserSearchFromTerminal (String input)
+    {
+        boolean first = true;
+        while (true) {
+            if (first) { 
+                first = false; 
+                putGame(input);
+                continue; 
+            }
+            input = getInput();
+            if (input.equals("") || input.equals("-done"))
+            putGame(input);
+        }
+    }
+
+    public void PresentGameToUser (Game Game)  // changes io state according to input
+    {
+        //  Show the game to user and wait for input. Store their input in LogController
+        putOutput("Your Game is: " + Game.getName() + " " + Game.getURL() + " " + "  Would you like to download it? Y/N");
+
+        String download = inputScanner.nextLine();  // Read user input
+        if (download.equals("Y") || download.equals("y")) {
+            Log.EXIT(Game);
+            putOutput("GAME FOUND " + Game.getName() + " URL--->" + Game.getURL());
+            System.exit(0);
+        }
+
+        outputStream.println("Do you want to add this game to search? Y/N");
+        
+        String likes = inputScanner.nextLine();  // Read user input
+        if (likes.equals("Y") || likes.equals("y")) {
+            iteration = 0;  
+            user.getUserData().likeGame(GameToPresent); 
+            GameToPresent = null;
+            return;
+        }
+    }
+
+    private void runSearch() 
+    {
+        // choose next best game from source
+        GameToPresent = search();
+
+        // remove this game
+        GameToPresent.RemoveGame();
+
+        // present this game
+        PresentGameToUser(GameToPresent);
+
+        // if user has said no to too many games, 
+        // clear out array and restart searching
+        if (iteration > MAX_DISLIKES) {
+            Log.MESSAGE("Revising search algorithm");
+            user.getUserData().removeSomeGames();
+            clearCache();
+            iteration = 0;
+            runInTerminal();
+        } else {
+            iteration++;
         }
     }
 
     public void runInTerminal () 
     {
-        Game GameToPresent = null;
-
-        while (true) // algorithm runs until exit condition met
-        {
-            // choose next best game from source
-            GameToPresent = SearchInstance.ChooseNext(SearchInstance.getUserData(), GameToPresent);
-
-            // remove this game
-            GameToPresent.RemoveGame();
-
-            // present this game
-            IOController.PresentGameToUser(GameToPresent);
-
-            // read input state
-            switch (IOController.getState()) {
-                case IOController.EXIT:
-                    GameSearch.EXIT(GameToPresent); 
-                case IOController.LIKE:
-                    iteration = 0;  
-                    SearchInstance.getUserData().addGame(GameToPresent); 
-                    SearchInstance.recache(GameToPresent); // removes games that need to be recalculated
-                    GameToPresent = null;
-            }
-
-            // reset io state
-            IOController.resetState();
-
-            // if user has said no to too many games, 
-            // clear out array and restart searching
-            if (iteration > MAX_DISLIKES) {
-                IOController.MESSAGE("Revising search algorithm");
-                SearchInstance.getUserData().removeSomeGames();
-                SearchInstance.clearCache();
-                runInTerminal();
-            } else {
-                iteration++;
-            }
+        while (true) {
+            runSearch();
         }
     }
 

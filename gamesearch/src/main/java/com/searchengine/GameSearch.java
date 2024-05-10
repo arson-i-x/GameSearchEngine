@@ -1,177 +1,208 @@
 package com.searchengine;
 
-import java.util.*;
+import java.io.File;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.NoSuchElementException;
 
+import org.apache.commons.io.FileUtils;
 
-public class GameSearch {
+import com.lukaspradel.steamapi.core.exception.SteamApiException;
+import com.lukaspradel.steamapi.webapi.client.SteamWebApiClient;
 
-    // how many times the algorithm will loop also controls accuracy of matches
-    private static final int MAX_ITERATIONS = Database.size(); 
-    
-    public UserData UserData;  // holds users games
-    private Map<Game, Long> cache; // holds weight of games already calculated
+public class GameSearch 
+{
+    protected static final File path = new File(FileUtils.getUserDirectoryPath()+"/gamesearch/");
+    protected static final int MAX_DISLIKES = 10;
+    protected static final SteamWebApiClient SteamClient = new SteamWebApiClient
+                                    .SteamWebApiClientBuilder
+                                    ("CF994D1D2070B5344BF6DF7337BDB2AB")
+                                    .build();
 
-    public GameSearch () // Searches a game database using Userdata as input
+    User user;                  // stores real user data
+    HashMap<Game, Long> cache;  // holds weight of games already calculated
+    int iteration;              // current iteration of search
+    Game GameToPresent;         // current game that is most relevant
+
+    public GameSearch ()        // Search instance constructor
     {
-        this.UserData = new UserData();
+        path.mkdirs();
+        Database.init();
+        this.user = new User();
         this.cache = new LinkedHashMap<>();
+        this.iteration = 0;
     }
 
-    public GameSearch (UserData data) // Searches a game database using Userdata as input
+    public void login(String steamid) throws SteamApiException, IOException
     {
-        this.UserData = data;
-        this.cache = new LinkedHashMap<>();
+        user.login(steamid);
     }
 
-    public UserData getUserData() 
+    public void clearLikes() 
     {
-        return this.UserData;
+        Map<Long, Long> ids = getUserData().getGames();
+        for (Long id : ids.keySet()) {
+            if (ids.get(id) < 0) {
+                ids.put(id, (long)0);
+                Log.MESSAGE(Database.getGame(id.toString()).getName()+" REMOVED");
+            }
+        }
+        clearCache();
+        Log.MESSAGE("LIKES DELETED");
     }
 
-    public void setUserData(UserData data) 
+    public void clearUserData() 
     {
-        this.UserData = data;
+        clearLikes();
+        com.searchengine.UserData.clearFile();
+        this.user = new User();
+        Log.MESSAGE("USERDATA DELETED");
     }
 
-    public void recache(Game thisGame)     // removes game from cache if it contains tags matching thisGame 
+    void recache(Game thisGame)     // removes game from cache if it contains tags matching thisGame 
     {
         Iterator<Game> iter = cache.keySet().iterator();
 
         while (iter.hasNext()) {
             Game game = iter.next();
             
-            if (!Collections.disjoint((Collection<String>)game.getTags(), 
-            (Collection<String>)thisGame.getTags())) 
-            { // Returns true if games have no matches
-                iter.remove();
+            for (String tag : thisGame.getTags()) {
+                if (game.getTags().contains(tag)) {
+                    iter.remove();
+                    break;
+                }
             }
         }
     }
 
-    public void clearCache() // removes all games from cache
+    void clearCache() // removes all games from cache
     {
         cache.clear();
     }
 
-    public Game ChooseNext (UserData tempUserData, Game lastGame) // chooses next game from the database by tag matches to user games 
+    private Long weight(Game thisGame, Map<String, Long> tags) // returns weight of a game by tag matches 
     {
-        // if user data is empty then return random game
-        if (tempUserData.getGames().isEmpty()) {
-            IOController.MESSAGE("Returning random game.");
-            return Database.getRandomGame();
+        long currWeight = 0;
+
+        // faster method to search, less deterministic
+        for (String tag : tags.keySet()) {
+            if (thisGame.getTags().contains(tag)) {
+                currWeight+= tags.get(tag);  
+            } else {
+                currWeight-= tags.get(tag); 
+            }
         }
 
-        Game nextGame = null; // initializer
+        //currWeight = thisGame.similarity(UserData) * currWeight;
 
+        cache.put(thisGame, currWeight);
+        return currWeight;
+    }
+
+    Game nextGame() throws NoSuchElementException // chooses next game from the database by max weight
+    {
+        Game nextGame = null, lastGame = GameToPresent;
+        iteration++;
         long maxWeight = Long.MIN_VALUE; // minimum # of matches
-        
-        int iteration = 0;  // breaks when past MAX_ITERATIONS
-
-        for (Game thisGame : Database.getAllGames()) {
+        Map<String, Long> tags = getUserData().getTags(); // get tagmap
+        boolean check_next_game = true;
+        for (Game thisGame : Database.getAllGames()) 
+        {      
+            if (!check_next_game) {
+                check_next_game = true; // skip every other game
+                continue;
+            }
+            check_next_game = false;
 
             long currWeight = 0;
 
-            if (thisGame.similarTo(lastGame) || thisGame.IsRemoved() || this.UserData.getGames().containsKey(thisGame.getGameID())) { 
-                continue; // prevents returning owned or removed games
+            if (lastGame != null && lastGame.getPopularity() > thisGame.getPopularity() && lastGame.getReviewScore() > thisGame.getReviewScore()) {
+                //Log.MESSAGE(thisGame.getName()+" SKIPPING");
+                //continue; // Skips based on popularity/rating
             } 
-            
-            if (nextGame != null && (nextGame.getPopularity() > thisGame.getPopularity() && nextGame.getReviewScore() > thisGame.getReviewScore())) {  
-                //continue; // if nextGame got better reviews and is more popular than thisGame then skip thisGame  TODO SKIP??                                          
-            }
+            if (user.getUserData().getGames().containsKey(thisGame.getGameID())) {     
+                //Log.MESSAGE(thisGame.getName()+" ALREADY OWNED: SKIPPING");
+                continue; // skips if already owned
+            } 
 
             // CHECK CACHE FOR WEIGHT BEFORE CALCULATING ANYTHING ELSE
-            if (cache.containsKey(thisGame)) {
+            if (cache.containsKey(thisGame))  {
                 currWeight = cache.get(thisGame);
-                if (currWeight > maxWeight) {
-                    nextGame = thisGame;
-                    maxWeight = currWeight;
-                    /*      DEBUG  */     IOController.MESSAGE("Next cached game is "+ thisGame.getName() + "with weight " + currWeight);
-                }
-                continue;
+            } else {
+                currWeight = weight(thisGame, tags);// * thisGame.getPopularity()+1;
             }
 
-            // check each user game and compare its tags to this game by tag weights (hours played)
-            /*for (Long SourceID: tempUserData.getGames().keySet()) {
-               
-                Game Source = Database.getGame(SourceID);
-                
-                if (Source == null || Source.getGameID() == thisGame.getGameID()) { continue; }
-                
-                for (String tag : Source.getTags()) {
-                    if (thisGame.getTags().contains(tag)) {
-                        currWeight+= tempUserData.getTagWeight(tag);  
-                    } else {
-                        currWeight-= tempUserData.getTagWeight(tag); 
-                    }
-                }
-            }*/
-
-            // faster method to search, less deterministic
-            for (String tag : UserData.getTags().keySet()) {
-                if (thisGame.getTags().contains(tag)) {
-                    currWeight+= tempUserData.getTagWeight(tag);  
-                } else {
-                    currWeight-= tempUserData.getTagWeight(tag); 
-                }
-            }
-
-            // cache this games weight and increment
-            cache.put(thisGame, currWeight);
-            iteration++;
-
-            // if combined weight is biggest found
-            // update thisGame to return
+            // update maxweight found
             if (currWeight > maxWeight) {
+                if (thisGame.similarTo(lastGame)) {
+                    getUserData().addGame(thisGame);
+                    continue;
+                }
                 maxWeight = currWeight;
                 nextGame = thisGame;
-                iteration = 0;
-                /*      DEBUG  */     IOController.MESSAGE("Next game is "+ nextGame.getName() + "with weight " + currWeight);
-            }
-
-            if (iteration > MAX_ITERATIONS) {
-               break;
+                Log.MESSAGE("Next Game is "+ thisGame.getName() + " with weight " + currWeight);// + " and similarity " + (thisGame.similarity(getUserData())+1));
             }
         }
 
-        // if nothing found at this point 
-        // there is a big problem. The user
-        // has likely searched every game in the 
-        // data base so throw an error and exit program
-        if (nextGame == null) {
-            EXIT("NO MORE GAMES IN DATABASE!");
-        } else {
-            // remove this game
-            nextGame.RemoveGame();
+        GameToPresent = nextGame;
+        
+        // if the game is still not found
+        // throw an error which will exit
+        // the program
+        if (GameToPresent == null) {
+            throw new NoSuchElementException();
         }
 
-        return nextGame;
+        getUserData().addGame(GameToPresent); // prevent game from showing up again
+        return GameToPresent;
     }
 
-    public static void EXIT(Game game) 
+    public UserData getUserData() 
     {
-        IOController.EXIT(game);
-        System.exit(0);
-    }
+        return this.user.getUserData();
+    }   
 
-    public static void EXIT(String error) 
+    public Game search() throws NoSuchElementException
     {
-        IOController.EXIT(error);
-        System.exit(1);
-    }
+        if (iteration > MAX_DISLIKES) {
+            Log.MESSAGE("REVISING SEARCH METHOD, REMOVING SOME GAMES");
+            List<Game> removedGames = getUserData().removeSomeGames();
+            for (Game game : removedGames) {
+                recache(game);
+            }
+            iteration = 0;
+        } 
 
-    // tests unit
-    public static void main (String[] args) 
+        // if user data is empty then return random game
+        if (getUserData().getGames().isEmpty()) {
+            Log.MESSAGE("Returning random game.");
+            return Database.getRandomGame();
+        }
+
+        return nextGame();
+    } 
+
+    public void like(Game game) 
+    {
+        iteration = 0;  
+        user.getUserData().likeGame(game); 
+        recache(game);          // removes games that need to be recalculated
+        GameToPresent = null;   // Set last game to null so similar games will show up
+    } 
+
+    public static void main (String[] args) // tests unit
     {
         Database.init();
-        UserData UserData = new UserData();
-        GameSearch NewGraph = new GameSearch(UserData);
-        
-        System.out.println("All games");
+        GameSearch search = new GameSearch();
+        Log.allLogs();
+        Log.MESSAGE("All games");
         for (Game game : Database.getAllGames()) {
-            
-            System.out.println(game.getName());
+            Log.MESSAGE(game.getName());
         }
-
-        System.out.println(NewGraph.ChooseNext(UserData, null).getName());
+        Log.EXIT(search.nextGame());
     }
 }

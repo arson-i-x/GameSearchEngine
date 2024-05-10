@@ -1,4 +1,6 @@
 package com.searchengine;
+
+import java.io.Serializable;
 import java.util.*;
 import org.apache.commons.csv.CSVRecord;
 
@@ -15,16 +17,16 @@ public class Game {
     private HashSet<String> tags;
     private boolean removed;
     private ReleaseDate date;
+    private Long hoursPlayed;
 
     // constructs a game object using a CSV record
-    Game (CSVRecord record) 
+    public Game () 
     {
-        // makes an empty game object
-        if (record == null) {
-            gameID = (long)-1;
-            return;
-        }
-
+        this.gameID = (long)-1;
+    }
+    
+    public Game (CSVRecord record) 
+    {
         // Game ID and Name
         gameID = Long.parseLong(record.get("App ID"));
         name = record.get("Title");
@@ -75,23 +77,38 @@ public class Game {
         removed = false;
     }
 
+    public Game (Game game) 
+    {
+        this.URL = game.URL;
+        this.date = game.date;
+        this.gameID = game.gameID;
+        this.hoursPlayed = game.hoursPlayed;
+        this.name = game.name;
+        this.price = game.price;
+        this.priceString = game.priceString;
+        this.reviewCount = game.reviewCount;
+        this.reviewRatio = game.reviewRatio;
+        this.removed = game.removed;
+        this.tags = game.tags;
+    }
+
     @Override
     public int hashCode() 
     {
         return gameID.hashCode();
     }
 
-    void RemoveGame () 
+    public void RemoveGame () 
     {
         removed = true;
     }
 
-    void InsertGame () 
+    public void InsertGame () 
     {
         removed = false;
     }
 
-    boolean IsRemoved () 
+    public boolean IsRemoved () 
     {
         return removed;
     }
@@ -136,25 +153,49 @@ public class Game {
         return URL;
     }
 
-    public Set<String> getTags() 
+    public HashSet<String> getTags() 
     {
         return tags;
     }
     
+    public boolean similarTo (Set<Game> games) 
+    {
+        for (Game game : games) {
+            if (similarTo(game)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public boolean similarTo (Game otherGame) 
     {
         if (otherGame == null) {
             return false;
         }
+        /*if (this.getTags().containsAll(otherGame.getTags())) {
+            return true;
+        }*/
 
-        if (FuzzySearch.ratio(name, otherGame.getName()) > 75) {
+        String upper = this.getName().toUpperCase();
+        String lower = new String(upper.toLowerCase());
+
+        String otherUpper = otherGame.getName().toUpperCase();
+        String otherLower = new String(otherUpper.toLowerCase());
+
+        int upperRatio = FuzzySearch.tokenSetRatio(upper, otherUpper);
+        int lowerRatio = FuzzySearch.tokenSetRatio(lower, otherLower);
+        int ratio = Integer.max(upperRatio, lowerRatio);
+        if (ratio > 50) {
+            Log.MESSAGE(this.getName() +" is similar to " + otherGame.getName()+"... SKIPPING");
             return true;
         } else {
+            Log.MESSAGE(this.getName() +" is NOT similar to " + otherGame.getName()+"... ratio is " + ratio);
             return false;
         }
     }
 
-    private final class ReleaseDate implements Comparable<ReleaseDate>  // release dates can be compared easily using this class
+    private final class ReleaseDate implements Comparable<ReleaseDate>, Serializable  // release dates can be compared easily using this class
     {
         int year;
         int month;
@@ -171,20 +212,8 @@ public class Game {
     // tests data structure
     public static void main (String[] args) 
     {
-        Game[] games = new Game[5];
         Database.init();
         Collection<Game> AllGames = Database.getAllGames();
-        int i = 0;
-        int first = 1;
-        for (CSVRecord record : Database.getRecords()) {
-            if (first == 1) { first = 0; continue; }
-            games[i] = new Game(record);
-            i++;
-            if (i == 5) {
-                break;
-            }
-        }
-
         int limit = 0;
         for (Game game : AllGames) {
             if (limit == 30) {break;}
@@ -195,5 +224,6 @@ public class Game {
             System.out.println(" " + game.price);
             limit++;
         }
+        
     }
 }

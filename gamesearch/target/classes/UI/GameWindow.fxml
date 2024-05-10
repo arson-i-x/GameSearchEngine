@@ -1,44 +1,158 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.Insets?>
+<?import javafx.scene.Cursor?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.effect.Blend?>
+<?import javafx.scene.effect.DropShadow?>
+<?import javafx.scene.effect.InnerShadow?>
 <?import javafx.scene.layout.AnchorPane?>
-<?import javafx.scene.layout.ColumnConstraints?>
-<?import javafx.scene.layout.GridPane?>
-<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.paint.Color?>
+<?import javafx.scene.text.Font?>
 <?import javafx.scene.web.WebView?>
 
-<AnchorPane prefHeight="720.0" prefWidth="1280.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="UI.GameWindow">
+<AnchorPane prefHeight="720.0" prefWidth="1280.0" style="-fx-background-color: #1b2838; -fx-border-radius: 5em;" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="UI.GameWindow">
    <children>
-      <GridPane layoutX="-212.0" prefHeight="611.0" prefWidth="840.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="1.0" AnchorPane.rightAnchor="1.0" AnchorPane.topAnchor="0.0">
-         <columnConstraints>
-            <ColumnConstraints maxWidth="88.0" minWidth="0.0" prefWidth="0.0" />
-            <ColumnConstraints hgrow="SOMETIMES" maxWidth="100.0" minWidth="0.0" prefWidth="0.0" />
-            <ColumnConstraints hgrow="SOMETIMES" maxWidth="200.0" minWidth="0.0" prefWidth="0.0" />
-            <ColumnConstraints hgrow="SOMETIMES" maxWidth="1278.0" minWidth="10.0" prefWidth="1278.0" />
-            <ColumnConstraints hgrow="SOMETIMES" maxWidth="200.0" minWidth="0.0" prefWidth="0.0" />
-            <ColumnConstraints hgrow="SOMETIMES" maxWidth="95.0" minWidth="0.0" prefWidth="0.0" />
-         </columnConstraints>
-         <rowConstraints>
-            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-            <RowConstraints maxHeight="24.0" minHeight="0.0" prefHeight="0.0" vgrow="SOMETIMES" />
-            <RowConstraints maxHeight="660.0" minHeight="10.0" prefHeight="660.0" vgrow="SOMETIMES" />
-            <RowConstraints maxHeight="25.0" minHeight="0.0" prefHeight="0.0" vgrow="SOMETIMES" />
-            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-         </rowConstraints>
-         <children>
-            <Button fx:id="likeButton" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#onLike" prefHeight="25.0" prefWidth="406.0" text="LIKE" GridPane.columnIndex="3" GridPane.halignment="CENTER" GridPane.hgrow="NEVER" GridPane.rowIndex="4" GridPane.vgrow="NEVER" />
-            <Button fx:id="downloadButton" maxHeight="-Infinity" maxWidth="-Infinity" mnemonicParsing="false" onAction="#onDownload" prefHeight="25.0" prefWidth="371.0" text="EXIT" GridPane.columnIndex="3" GridPane.halignment="LEFT" GridPane.rowIndex="4" />
-            <Label alignment="CENTER" maxWidth="1.7976931348623157E308" text="YOUR GAME IS" GridPane.columnIndex="1" GridPane.columnSpan="2147483647" />
-            <Button fx:id="nextButton" mnemonicParsing="false" onAction="#onNext" prefHeight="25.0" prefWidth="364.0" text="NEXT" GridPane.columnIndex="3" GridPane.halignment="RIGHT" GridPane.rowIndex="4" />
-            <WebView fx:id="view" prefWidth="994.0" GridPane.columnIndex="3" GridPane.hgrow="ALWAYS" GridPane.rowIndex="2" GridPane.vgrow="ALWAYS">
-               <GridPane.margin>
-                  <Insets />
-               </GridPane.margin>
-            </WebView>
-         </children>
-      </GridPane>
-      <Label fx:id="time" prefHeight="33.0" prefWidth="381.0" />
+      <WebView fx:id="view" layoutY="70.0" prefHeight="606.0" prefWidth="1289.0" style="fx-background-color: #1b2838;" AnchorPane.bottomAnchor="44.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="70.0" />
+      <Button fx:id="DeleteData" layoutX="1.0" layoutY="694.0" maxHeight="-Infinity" maxWidth="-Infinity" mnemonicParsing="false" onAction="#deleteLibraryData" prefHeight="39.0" prefWidth="147.0" style="-fx-background-color: #1b2838;" text="DELETE ALL USER DATA" textFill="#c2c2c2" AnchorPane.bottomAnchor="1.0">
+         <cursor>
+            <Cursor fx:constant="HAND" />
+         </cursor></Button>
+      <Button fx:id="clear" layoutX="1193.0" layoutY="694.0" maxHeight="-Infinity" maxWidth="-Infinity" mnemonicParsing="false" onAction="#clearLikes" prefHeight="39.0" prefWidth="100.0" style="-fx-background-color: #1b2838;" text="CLEAR LIKES" textFill="#c2c2c2" AnchorPane.bottomAnchor="1.0" AnchorPane.rightAnchor="0.0">
+         <cursor>
+            <Cursor fx:constant="HAND" />
+         </cursor></Button>
+      <Button fx:id="exit" layoutX="1262.0" layoutY="2.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#exit" opacity="0.85" prefHeight="25.0" prefWidth="27.0" style="-fx-background-color: #1b2838;" text="X" textFill="WHITE" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="2.0">
+         <font>
+            <Font name="Segoe UI Bold" size="11.0" />
+         </font>
+         <cursor>
+            <Cursor fx:constant="HAND" />
+         </cursor>
+         <effect>
+            <InnerShadow height="5.61" radius="1.0225" width="0.48">
+               <color>
+                  <Color red="1.0" green="1.0" blue="1.0" opacity="0.0" />
+               </color>
+            </InnerShadow>
+         </effect>
+      </Button>
+      <TextField fx:id="URL" layoutX="77.0" layoutY="32.0" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" onAction="#onEnter" prefHeight="39.0" prefWidth="1135.0" style="-fx-background-color: #1b2838; -fx-text-fill: #ffffff;" text="STEAM GAME SEARCH" AnchorPane.leftAnchor="77.0" AnchorPane.rightAnchor="77.0" AnchorPane.topAnchor="32.0">
+         <font>
+            <Font name="Calibri" size="24.0" />
+         </font>
+         <cursor>
+            <Cursor fx:constant="TEXT" />
+         </cursor>
+         <effect>
+            <DropShadow>
+               <color>
+                  <Color red="1.0" green="1.0" blue="1.0" />
+               </color>
+            </DropShadow>
+         </effect>
+      </TextField>
+      <Button fx:id="backButton1" layoutX="1.0" layoutY="32.0" mnemonicParsing="false" onAction="#backButton" prefHeight="39.0" prefWidth="75.0" style="-fx-background-color: #1b2838;" text="&lt;&lt;&lt;" textFill="WHITE" AnchorPane.leftAnchor="1.0" AnchorPane.topAnchor="32.0">
+         <cursor>
+            <Cursor fx:constant="HAND" />
+         </cursor>
+         <effect>
+            <DropShadow height="22.78" radius="11.057500000000001" width="23.45">
+               <color>
+                  <Color red="1.0" green="1.0" blue="1.0" />
+               </color></DropShadow>
+         </effect>
+         <font>
+            <Font size="17.0" />
+         </font></Button>
+      <Button fx:id="nextWindow" layoutX="1213.0" layoutY="32.0" mnemonicParsing="false" onAction="#nextButton" prefHeight="39.0" prefWidth="75.0" style="-fx-background-color: #1b2838;" text="&gt;&gt;&gt;" textFill="WHITE" AnchorPane.rightAnchor="1.0" AnchorPane.topAnchor="32.0">
+         <cursor>
+            <Cursor fx:constant="HAND" />
+         </cursor>
+         <effect>
+            <DropShadow>
+               <color>
+                  <Color red="1.0" green="1.0" blue="1.0" />
+               </color></DropShadow>
+         </effect>
+         <font>
+            <Font size="17.0" />
+         </font></Button>
+      <Label fx:id="time" layoutX="1008.0" layoutY="39.0" prefHeight="25.0" prefWidth="122.0" textFill="WHITE" AnchorPane.rightAnchor="78.0" AnchorPane.topAnchor="39.0" />
+      <Button fx:id="likeButton" layoutX="1116.0" layoutY="247.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#onLike" opacity="0.85" prefHeight="134.0" prefWidth="147.0" style="-fx-background-color: #1b2838;" text="LIKE" textFill="WHITE" AnchorPane.rightAnchor="26.0">
+         <font>
+            <Font name="Segoe UI Bold Italic" size="22.0" />
+         </font>
+         <cursor>
+            <Cursor fx:constant="HAND" />
+         </cursor>
+         <effect>
+            <InnerShadow blurType="GAUSSIAN" choke="0.39">
+               <color>
+                  <Color red="1.0" green="1.0" blue="1.0" />
+               </color>
+            </InnerShadow>
+         </effect>
+      </Button>
+      <Button fx:id="nextButton" layoutX="1116.0" layoutY="381.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#onNext" opacity="0.86" prefHeight="134.0" prefWidth="147.0" style="-fx-background-color: #1b2838;" text="NEXT" textFill="WHITE" AnchorPane.rightAnchor="26.0">
+         <font>
+            <Font name="Segoe UI Bold Italic" size="22.0" />
+         </font>
+         <cursor>
+            <Cursor fx:constant="HAND" />
+         </cursor>
+         <effect>
+            <InnerShadow blurType="GAUSSIAN" choke="0.31" height="23.94" radius="11.47" width="23.94">
+               <color>
+                  <Color red="1.0" green="1.0" blue="1.0" />
+               </color>
+            </InnerShadow>
+         </effect>
+      </Button>
+      <Button fx:id="search" layoutX="14.0" layoutY="314.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#returnToSearch" opacity="0.85" prefHeight="134.0" prefWidth="147.0" style="-fx-background-color: #1b2838;" text="BACK" textFill="WHITE" AnchorPane.leftAnchor="14.0">
+         <font>
+            <Font name="Segoe UI Bold Italic" size="22.0" />
+         </font>
+         <cursor>
+            <Cursor fx:constant="HAND" />
+         </cursor>
+         <effect>
+            <InnerShadow blurType="GAUSSIAN" choke="0.39">
+               <color>
+                  <Color red="1.0" green="1.0" blue="1.0" />
+               </color>
+            </InnerShadow>
+         </effect>
+      </Button>
+      <Button fx:id="max" layoutX="1234.0" layoutY="2.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#maximize" opacity="0.85" prefHeight="25.0" prefWidth="27.0" style="-fx-background-color: #1b2838;" text="O" textFill="WHITE" AnchorPane.rightAnchor="21.0" AnchorPane.topAnchor="2.0">
+         <font>
+            <Font name="Segoe UI Bold Italic" size="11.0" />
+         </font>
+         <cursor>
+            <Cursor fx:constant="HAND" />
+         </cursor>
+         <effect>
+            <InnerShadow height="5.61" radius="1.0225" width="0.48">
+               <color>
+                  <Color red="1.0" green="1.0" blue="1.0" opacity="0.0" />
+               </color>
+            </InnerShadow>
+         </effect>
+      </Button>
+      <TextField fx:id="title" editable="false" layoutX="1.0" layoutY="2.0" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="25.0" prefWidth="107.0" style="-fx-background-color: #1b2838; -fx-text-fill: #ffffff;" text="GAME SEARCH" AnchorPane.topAnchor="2.0">
+         <font>
+            <Font name="Calibri" size="15.0" />
+         </font>
+         <cursor>
+            <Cursor fx:constant="TEXT" />
+         </cursor>
+      </TextField>
    </children>
+   <effect>
+      <Blend />
+   </effect>
+   <cursor>
+      <Cursor fx:constant="CROSSHAIR" />
+   </cursor>
 </AnchorPane>

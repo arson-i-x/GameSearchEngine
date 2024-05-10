@@ -1,14 +1,92 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.Cursor?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.TextField?>
+<?import javafx.scene.effect.InnerShadow?>
+<?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.paint.Color?>
+<?import javafx.scene.text.Font?>
 
-<AnchorPane prefWidth="610.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="UI.LoginWindow">
+<AnchorPane prefHeight="470.0" prefWidth="610.0" style="-fx-background-color: #1b2838;" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="UI.LoginWindow">
    <children>
-      <Button fx:id="submitIDButton" layoutX="637.0" layoutY="21.0" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#onLogin" prefHeight="58.0" prefWidth="220.0" text="Submit" />
-      <TextField fx:id="steamIDInput" layoutX="29.0" layoutY="35.0" maxWidth="-Infinity" prefHeight="31.0" prefWidth="579.0" promptText="Enter Your Steam ID Name" />
-      <ImageView fx:id="image" fitHeight="506.0" fitWidth="890.0" layoutY="86.0" pickOnBounds="true" preserveRatio="true" />
+      <ImageView fx:id="image" fitHeight="538.0" fitWidth="889.0" layoutY="54.0" pickOnBounds="true" preserveRatio="true">
+         <image>
+            <Image url="@helpimage.gif" />
+         </image></ImageView>
+      <TextField fx:id="steamIDInput" focusTraversable="false" layoutX="4.0" layoutY="4.0" minWidth="0.0" nodeOrientation="LEFT_TO_RIGHT" onAction="#onLogin" opacity="0.63" prefHeight="31.0" prefWidth="780.0" promptText="Enter Your Steam ID" style="-fx-background-color: #1b2838; -fx-text-fill: #ffffff;">
+         <cursor>
+            <Cursor fx:constant="TEXT" />
+         </cursor>
+         <effect>
+            <InnerShadow choke="0.51" height="12.21" radius="4.1375" width="6.34">
+               <color>
+                  <Color red="1.0" green="1.0" blue="1.0" />
+               </color>
+            </InnerShadow>
+         </effect>
+      </TextField>
+      <Button fx:id="submit" layoutX="787.0" layoutY="4.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#onLogin" opacity="0.85" prefHeight="31.0" prefWidth="75.0" style="-fx-background-color: #1b2838;" text="ENTER" textFill="WHITE">
+         <font>
+            <Font name="Segoe UI Bold" size="11.0" />
+         </font>
+         <cursor>
+            <Cursor fx:constant="HAND" />
+         </cursor>
+         <effect>
+            <InnerShadow blurType="GAUSSIAN" choke="0.39" height="12.21" radius="4.140000000000001" width="6.35">
+               <color>
+                  <Color red="1.0" green="1.0" blue="1.0" />
+               </color>
+            </InnerShadow>
+         </effect>
+      </Button>
+      <Button fx:id="back" layoutX="4.0" layoutY="36.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#backButton" opacity="0.85" prefHeight="19.0" prefWidth="101.0" style="-fx-background-color: #1b2838;" text="&lt;&lt;&lt;" textFill="WHITE">
+         <font>
+            <Font name="Segoe UI Bold" size="11.0" />
+         </font>
+         <cursor>
+            <Cursor fx:constant="HAND" />
+         </cursor>
+         <effect>
+            <InnerShadow blurType="GAUSSIAN" choke="0.39" height="12.21" radius="4.140000000000001" width="6.35">
+               <color>
+                  <Color red="1.0" green="1.0" blue="1.0" />
+               </color>
+            </InnerShadow>
+         </effect>
+      </Button>
+      <Button fx:id="skip" layoutX="787.0" layoutY="36.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#search" opacity="0.85" prefHeight="19.0" prefWidth="101.0" style="-fx-background-color: #1b2838;" text="&gt;&gt;&gt;" textFill="WHITE">
+         <font>
+            <Font name="Segoe UI Bold" size="11.0" />
+         </font>
+         <cursor>
+            <Cursor fx:constant="HAND" />
+         </cursor>
+         <effect>
+            <InnerShadow blurType="GAUSSIAN" choke="0.39" height="12.21" radius="4.140000000000001" width="6.35">
+               <color>
+                  <Color red="1.0" green="1.0" blue="1.0" />
+               </color>
+            </InnerShadow>
+         </effect>
+      </Button>
+      <Button fx:id="exit" layoutX="863.0" layoutY="4.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#exit" opacity="0.85" prefHeight="31.0" prefWidth="26.0" style="-fx-background-color: #1b2838;" text="X" textFill="WHITE">
+         <font>
+            <Font name="Segoe UI Bold Italic" size="11.0" />
+         </font>
+         <cursor>
+            <Cursor fx:constant="HAND" />
+         </cursor>
+         <effect>
+            <InnerShadow blurType="GAUSSIAN" height="15.14" radius="6.3375" width="12.21">
+               <color>
+                  <Color red="1.0" green="1.0" blue="1.0" />
+               </color>
+            </InnerShadow>
+         </effect>
+      </Button>
    </children>
 </AnchorPane>

@@ -1,31 +1,23 @@
 package UI;
 
 import java.net.URL;
-
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.ResourceBundle;
-import javax.naming.NameNotFoundException;
+import java.util.Set;
 import javax.swing.JOptionPane;
-
 import com.searchengine.Database;
 import com.searchengine.Game;
+import com.searchengine.Log;
+
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.TextField;
-import javafx.scene.web.*;
 import org.controlsfx.control.textfield.TextFields;
-import org.w3c.dom.Text;
 
 public class SearchWindow extends WINDOW implements Initializable {
 
     @FXML
     TextField query;
-
-    @FXML WebView view;
-
-    WebEngine engine;
 
     static Game search;
 
@@ -35,17 +27,25 @@ public class SearchWindow extends WINDOW implements Initializable {
     }
 
     @FXML
+    public void backButton() 
+    {
+        SearchApp.display(new MainWindow());
+    }
+
+    @FXML
     public void query()
     {
-//        Database.init();
-//        List<String> gameNames = new ArrayList<>();
-//        for (Game game : Database.getAllGames()) {
-//            gameNames.add(game.getName());
-//        }
-//        TextFields.bindAutoCompletion(query, gameNames);
+        String input = query.getText();
+        if (input.equals("")) {
+            search();
+            return;
+        }
         try {
-            engine.load(SearchApp.getSearchInstance().getUserData().addGame(query.getText()));
-        } catch (NameNotFoundException nameNotFoundException) {
+            SearchApp.addGame(input);
+            query.clear();
+            JOptionPane.showMessageDialog(null, input + " added to library");
+        } catch (RuntimeException n) {
+            Log.ERROR("GAME NOT FOUND");
             JOptionPane.showMessageDialog(null, "GAME NOT FOUND");
         }
     }
@@ -53,17 +53,19 @@ public class SearchWindow extends WINDOW implements Initializable {
     @FXML
     public void search()
     {
-        SearchApp.display(GameWindow.presentGame(SearchApp.getSearchInstance().nextGame(), (long)1));
+        SearchApp.display(new GameWindow());
+        SearchApp.changeWindowSize();
+    }
+
+    @FXML
+    public void exit() 
+    {
+        Platform.exit();
     }
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        engine = view.getEngine();
-        Database.init();
-        List<String> gameNames = new ArrayList<>();
-        for (Game game : Database.getAllGames()) {
-            gameNames.add(game.getName());
-        }
+        Set<String> gameNames = Database.getAllNames();
         TextFields.bindAutoCompletion(query, gameNames);
     }
 }
