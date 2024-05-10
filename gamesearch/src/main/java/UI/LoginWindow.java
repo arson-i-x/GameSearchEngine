@@ -1,18 +1,14 @@
 package UI;
 
 import java.io.IOException;
-import java.net.URL;
-import java.util.ResourceBundle;
 import javax.swing.JOptionPane;
 import com.lukaspradel.steamapi.core.exception.SteamApiException;
+import javafx.application.Platform;
 import javafx.fxml.FXML;
-import javafx.fxml.Initializable;
 import javafx.scene.control.TextField;
-import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 
-public class LoginWindow extends WINDOW implements Initializable {
-    private final Image helpImage = new Image(WINDOW.class.getResourceAsStream("helpimage.jpg"));
+public class LoginWindow extends WINDOW {
 
     @FXML
     TextField steamIDInput;
@@ -32,10 +28,17 @@ public class LoginWindow extends WINDOW implements Initializable {
     }
 
     @FXML
+    public void search() 
+    {
+        SearchApp.display(new GameWindow());
+        SearchApp.changeWindowSize();
+    }
+
+    @FXML
     public void onLogin() 
     {
         try {
-            SearchApp.getSearchInstance().login(steamIDInput.getText());   // builds userdata from steamid
+            SearchApp.login(steamIDInput.getText());   // builds userdata from steamid
             SearchApp.display(new GameWindow());
         } catch (SteamApiException sae) {
             JOptionPane.showMessageDialog(null,sae.getMessage());
@@ -46,8 +49,9 @@ public class LoginWindow extends WINDOW implements Initializable {
         }
     }
 
-    @Override
-    public void initialize(URL location, ResourceBundle resources) {
-        this.image.setImage(helpImage);
+    @FXML
+    public void exit() 
+    {
+        Platform.exit();
     }
 }

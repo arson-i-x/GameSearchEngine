@@ -1,61 +1,50 @@
 package com.searchengine;
 
+import java.io.File;
 import java.io.IOException;
-import java.util.*;
-import javax.swing.JOptionPane;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.NoSuchElementException;
+
+import org.apache.commons.io.FileUtils;
+
 import com.lukaspradel.steamapi.core.exception.SteamApiException;
 import com.lukaspradel.steamapi.webapi.client.SteamWebApiClient;
 
-
 public class GameSearch 
 {
+    protected static final File path = new File(FileUtils.getUserDirectoryPath()+"/gamesearch/");
     protected static final int MAX_DISLIKES = 10;
     protected static final SteamWebApiClient SteamClient = new SteamWebApiClient
                                     .SteamWebApiClientBuilder
                                     ("CF994D1D2070B5344BF6DF7337BDB2AB")
                                     .build();
 
-    List<Game> database;        // stores all games
     User user;                  // stores real user data
-    UserData UserData;          // holds user selected games and data
     HashMap<Game, Long> cache;  // holds weight of games already calculated
     int iteration;              // current iteration of search
     Game GameToPresent;         // current game that is most relevant
-    GameSearch otherSearchInstance; // another search instance for threading
 
     public GameSearch ()        // Search instance constructor
     {
+        path.mkdirs();
         Database.init();
-        this.database = Database.getAllGames();
         this.user = new User();
-        this.UserData = user.getUserData();
         this.cache = new LinkedHashMap<>();
         this.iteration = 0;
-        this.otherSearchInstance = new GameSearch(this);
-    }
-
-    private GameSearch (GameSearch instance) // Search instance constructor
-    {
-        this.user = instance.user;
-        this.UserData = new UserData(user.getUserData());
-        this.cache = new LinkedHashMap<>();
-        this.iteration = instance.iteration;
     }
 
     public void login(String steamid) throws SteamApiException, IOException
     {
         user.login(steamid);
-        UserData = new UserData(user.getUserData());
-    }
-
-    public UserData getUserData() 
-    {
-        return this.UserData;
     }
 
     public void clearLikes() 
     {
-        Map<Long, Long> ids = UserData.getGames();
+        Map<Long, Long> ids = getUserData().getGames();
         for (Long id : ids.keySet()) {
             if (ids.get(id) < 0) {
                 ids.put(id, (long)0);
@@ -71,7 +60,6 @@ public class GameSearch
         clearLikes();
         com.searchengine.UserData.clearFile();
         this.user = new User();
-        this.UserData = new UserData(user.getUserData());
         Log.MESSAGE("USERDATA DELETED");
     }
 
@@ -96,7 +84,7 @@ public class GameSearch
         cache.clear();
     }
 
-    private long weight(Game thisGame, HashMap<String, Long> tags) // returns weight of a game by tag matches 
+    private Long weight(Game thisGame, Map<String, Long> tags) // returns weight of a game by tag matches 
     {
         long currWeight = 0;
 
@@ -115,61 +103,82 @@ public class GameSearch
         return currWeight;
     }
 
-    protected Game nextGame() throws NoSuchElementException // chooses next game from the database by max weight
+    Game nextGame() throws NoSuchElementException // chooses next game from the database by max weight
     {
+        Game nextGame = null, lastGame = GameToPresent;
+        iteration++;
         long maxWeight = Long.MIN_VALUE; // minimum # of matches
-        HashMap<String, Long> tags = UserData.getTags(); // get tagmap
-        for (Game thisGame : database) 
-        {        
+        Map<String, Long> tags = getUserData().getTags(); // get tagmap
+        boolean check_next_game = true;
+        for (Game thisGame : Database.getAllGames()) 
+        {      
+            if (!check_next_game) {
+                check_next_game = true; // skip every other game
+                continue;
+            }
+            check_next_game = false;
+
             long currWeight = 0;
-            
-            if (thisGame.similarTo(GameToPresent)) {
-                continue; // skips if user didn't like last game and the name is similar
-            } 
-            if (GameToPresent != null && GameToPresent.getPopularity() > thisGame.getPopularity() && GameToPresent.getReviewScore() > thisGame.getReviewScore()) {
+
+            if (lastGame != null && lastGame.getPopularity() > thisGame.getPopularity() && lastGame.getReviewScore() > thisGame.getReviewScore()) {
+                //Log.MESSAGE(thisGame.getName()+" SKIPPING");
                 //continue; // Skips based on popularity/rating
             } 
-            if (UserData.getGames().containsKey(thisGame.getGameID())) {     
+            if (user.getUserData().getGames().containsKey(thisGame.getGameID())) {     
+                //Log.MESSAGE(thisGame.getName()+" ALREADY OWNED: SKIPPING");
                 continue; // skips if already owned
             } 
 
             // CHECK CACHE FOR WEIGHT BEFORE CALCULATING ANYTHING ELSE
-            if (cache.containsKey(thisGame)) {
+            if (cache.containsKey(thisGame))  {
                 currWeight = cache.get(thisGame);
             } else {
-                currWeight = weight(thisGame, tags);
+                currWeight = weight(thisGame, tags);// * thisGame.getPopularity()+1;
             }
 
             // update maxweight found
             if (currWeight > maxWeight) {
+                if (thisGame.similarTo(lastGame)) {
+                    getUserData().addGame(thisGame);
+                    continue;
+                }
                 maxWeight = currWeight;
-                GameToPresent = thisGame;
-                iteration = 0;
-                Log.MESSAGE("Next Game is "+ GameToPresent.getName() + " with weight " + currWeight);
+                nextGame = thisGame;
+                Log.MESSAGE("Next Game is "+ thisGame.getName() + " with weight " + currWeight);// + " and similarity " + (thisGame.similarity(getUserData())+1));
             }
         }
+
+        GameToPresent = nextGame;
         
-        if (GameToPresent != null) {
-            UserData.addGame(GameToPresent, 0); // prevent game from showing up again
-            Log.MESSAGE("Best game is "+ GameToPresent.getName());
+        // if the game is still not found
+        // throw an error which will exit
+        // the program
+        if (GameToPresent == null) {
+            throw new NoSuchElementException();
         }
-        
-        
+
+        getUserData().addGame(GameToPresent); // prevent game from showing up again
         return GameToPresent;
     }
 
-    public Game search() 
+    public UserData getUserData() 
     {
-        iteration++;
+        return this.user.getUserData();
+    }   
 
+    public Game search() throws NoSuchElementException
+    {
         if (iteration > MAX_DISLIKES) {
-            JOptionPane.showMessageDialog(null,"REVISING SEARCH");
-            UserData.removeSomeGames();
-            clearCache();
+            Log.MESSAGE("REVISING SEARCH METHOD, REMOVING SOME GAMES");
+            List<Game> removedGames = getUserData().removeSomeGames();
+            for (Game game : removedGames) {
+                recache(game);
+            }
+            iteration = 0;
         } 
 
         // if user data is empty then return random game
-        if (UserData.getGames().isEmpty()) {
+        if (getUserData().getGames().isEmpty()) {
             Log.MESSAGE("Returning random game.");
             return Database.getRandomGame();
         }
@@ -180,7 +189,7 @@ public class GameSearch
     public void like(Game game) 
     {
         iteration = 0;  
-        UserData.likeGame(game); 
+        user.getUserData().likeGame(game); 
         recache(game);          // removes games that need to be recalculated
         GameToPresent = null;   // Set last game to null so similar games will show up
     } 
@@ -189,12 +198,11 @@ public class GameSearch
     {
         Database.init();
         GameSearch search = new GameSearch();
-        
+        Log.allLogs();
         Log.MESSAGE("All games");
         for (Game game : Database.getAllGames()) {
             Log.MESSAGE(game.getName());
         }
-
         Log.EXIT(search.nextGame());
     }
 }

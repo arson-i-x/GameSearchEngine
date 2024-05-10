@@ -1,4 +1,5 @@
 package com.searchengine;
+
 import java.io.Serializable;
 import java.util.*;
 import org.apache.commons.csv.CSVRecord;
@@ -157,6 +158,16 @@ public class Game {
         return tags;
     }
     
+    public boolean similarTo (Set<Game> games) 
+    {
+        for (Game game : games) {
+            if (similarTo(game)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public boolean similarTo (Game otherGame) 
     {
         if (otherGame == null) {
@@ -165,18 +176,23 @@ public class Game {
         /*if (this.getTags().containsAll(otherGame.getTags())) {
             return true;
         }*/
-        return FuzzySearch.ratio(name, otherGame.getName()) > 75;
-    }
 
-    public int similarity (UserData data) 
-    {
-        Set<String> usertags = data.getTags().keySet();
-        if (usertags.containsAll(this.getTags())) {
-            return 100;
+        String upper = this.getName().toUpperCase();
+        String lower = new String(upper.toLowerCase());
+
+        String otherUpper = otherGame.getName().toUpperCase();
+        String otherLower = new String(otherUpper.toLowerCase());
+
+        int upperRatio = FuzzySearch.tokenSetRatio(upper, otherUpper);
+        int lowerRatio = FuzzySearch.tokenSetRatio(lower, otherLower);
+        int ratio = Integer.max(upperRatio, lowerRatio);
+        if (ratio > 50) {
+            Log.MESSAGE(this.getName() +" is similar to " + otherGame.getName()+"... SKIPPING");
+            return true;
+        } else {
+            Log.MESSAGE(this.getName() +" is NOT similar to " + otherGame.getName()+"... ratio is " + ratio);
+            return false;
         }
-        List<String> newlist = new ArrayList<>(this.getTags());
-        newlist.retainAll(usertags);
-        return newlist.size()/usertags.size();
     }
 
     private final class ReleaseDate implements Comparable<ReleaseDate>, Serializable  // release dates can be compared easily using this class
@@ -208,5 +224,6 @@ public class Game {
             System.out.println(" " + game.price);
             limit++;
         }
+        
     }
 }

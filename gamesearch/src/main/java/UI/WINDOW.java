@@ -1,12 +1,19 @@
 package UI;
 
 import java.io.IOException;
+import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
+import javafx.scene.layout.AnchorPane;
 
 public class WINDOW {
 
     private FXMLLoader loader;
+
+    @FXML
+    AnchorPane anchor;
+
+    double x = 0, y = 0;
 
     // Open and returns a scene root using FXML Loader
     public void open(String path) throws RuntimeException
@@ -21,13 +28,5 @@ public class WINDOW {
         } catch (IOException exception) {
             throw new RuntimeException(exception);
         }
-    }
-
-    // GUI WINDOW TEST
-    public static void main (String[] args) 
-    {
-
-        SearchApp.launch(SearchApp.class, args);
-
     }
 }

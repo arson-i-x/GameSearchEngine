@@ -8,29 +8,32 @@ import org.apache.commons.csv.*;
 import me.xdrop.fuzzywuzzy.FuzzySearch;
 
 final public class Database {
-    
+    private static final InputStream databaseFile = Database.class.getResourceAsStream("GameDataset.csv");
+    private static final Random rand = new Random();
     private static final Map<String, Game> GameTable = new LinkedHashMap<>();
+    private static int size = 0;
 
     public static void init()  // constructs a database from default path 
     {
-        parseCSV("gamesearch/src/main/resources/GameDataset.csv");
+        parseCSV(databaseFile);
     }
 
     public static Game getRandomGame() // gets random game from table
     {
-        return getAllGames().get(0);
+        int random = rand.nextInt(Database.size());
+        return getAllGames().get(random);
     }
 
     public static int size () 
     {
-        return GameTable.size()/2;
+        return size;
     }
 
     public static List<Game> getAllGames() // gets all game object in the database
     {
-        //List<Game> games = new ArrayList<>(GameTable.values());
-        //Collections.shuffle(games); // Shuffles gamelist on each call
-        return new ArrayList<>(GameTable.values());
+        List<Game> games = new ArrayList<>(GameTable.values());
+        Collections.shuffle(games); // Shuffles gamelist on each call
+        return new ArrayList<>(games);
     }
 
     public static Set<String> getAllNames()
@@ -94,14 +97,15 @@ final public class Database {
         return bestGame;
     }
 
-    static void parseCSV(String path)   // parses a CSV file into database using given string path as input
+    static void parseCSV(InputStream file)   // parses a CSV file into database using given string path as input
     {
         // clears database for new entries
         GameTable.clear();
+        size = 0;
 
         // Uses CSV library to parse records with header format
         try {   
-            Reader in = new FileReader(path); 
+            Reader in = new InputStreamReader(file); 
             Iterable<CSVRecord> records = CSVFormat.RFC4180.builder().setHeader("App ID",
                                                                         "Title",
                                                                         "Reviews Total",
@@ -130,6 +134,7 @@ final public class Database {
     {
         GameTable.put(id, game);
         GameTable.put(title, game);
+        size++;
     }
 
     public static void main(String[] args) // tests database structure. Use this to ensure filepath is set correctly

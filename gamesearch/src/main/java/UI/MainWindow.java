@@ -3,7 +3,6 @@ package UI;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 
-
 public class MainWindow extends WINDOW {
     
     public MainWindow() 

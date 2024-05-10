@@ -6,6 +6,9 @@ import java.util.Set;
 import javax.swing.JOptionPane;
 import com.searchengine.Database;
 import com.searchengine.Game;
+import com.searchengine.Log;
+
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.TextField;
@@ -38,10 +41,12 @@ public class SearchWindow extends WINDOW implements Initializable {
             return;
         }
         try {
-            SearchApp.getSearchInstance().getUserData().addGame(input);
+            SearchApp.addGame(input);
             query.clear();
+            JOptionPane.showMessageDialog(null, input + " added to library");
         } catch (RuntimeException n) {
-            JOptionPane.showMessageDialog(null, "GAME NOT FOUND\n"+n.getMessage());
+            Log.ERROR("GAME NOT FOUND");
+            JOptionPane.showMessageDialog(null, "GAME NOT FOUND");
         }
     }
 
@@ -49,6 +54,13 @@ public class SearchWindow extends WINDOW implements Initializable {
     public void search()
     {
         SearchApp.display(new GameWindow());
+        SearchApp.changeWindowSize();
+    }
+
+    @FXML
+    public void exit() 
+    {
+        Platform.exit();
     }
 
     @Override

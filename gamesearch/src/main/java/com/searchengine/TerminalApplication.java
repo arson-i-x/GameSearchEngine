@@ -47,7 +47,7 @@ public class TerminalApplication extends GameSearch
     private void putGame(String input) 
     {
         try {
-            getUserData().addGame(input);   
+            user.getUserData().addGame(input);   
         } catch (RuntimeException e) {
             putOutput(e.getMessage());
             e.printStackTrace();
@@ -86,8 +86,7 @@ public class TerminalApplication extends GameSearch
         String likes = inputScanner.nextLine();  // Read user input
         if (likes.equals("Y") || likes.equals("y")) {
             iteration = 0;  
-            getUserData().likeGame(GameToPresent); 
-            recache(GameToPresent); // removes games that need to be recalculated
+            user.getUserData().likeGame(GameToPresent); 
             GameToPresent = null;
             return;
         }
@@ -108,7 +107,7 @@ public class TerminalApplication extends GameSearch
         // clear out array and restart searching
         if (iteration > MAX_DISLIKES) {
             Log.MESSAGE("Revising search algorithm");
-            UserData.removeSomeGames();
+            user.getUserData().removeSomeGames();
             clearCache();
             iteration = 0;
             runInTerminal();

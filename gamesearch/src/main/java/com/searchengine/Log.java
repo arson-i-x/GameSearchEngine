@@ -1,15 +1,21 @@
 package com.searchengine;
-import java.io.PrintStream;
-import java.util.Scanner;
+
+import org.apache.logging.log4j.*;
+import org.apache.logging.log4j.core.appender.FileAppender;
+import org.apache.logging.log4j.core.config.Configurator;
 
 public class Log 
 {
-    private static final Scanner inputScanner = new Scanner(System.in);
-    private static final PrintStream outputStream = new PrintStream(System.out);
+    private static final Logger log = LogManager.getLogger(Log.class);
+
+    public static void allLogs() 
+    {
+        Configurator.setLevel(log, Level.ALL);
+    }
 
     static void GameAdded (Game Query, UserData File)
     {
-        outputStream.println(Query.getName() + " has been added to search with hours: "+ File.getGames().get(Query.getGameID()));
+        log.info(Query.getName() + " has been added to search with hours: "+ File.getGames().get(Query.getGameID()));
     }
 
     static void userdata (UserData data)
@@ -26,33 +32,25 @@ public class Log
 
     public static void ERROR(Object errorMessage) 
     {
-        outputStream.println("ERROR: " + errorMessage);
+        log.error(errorMessage);
     }
 
     public static void MESSAGE(Object message)
     {
-        outputStream.println(message.toString());
+        log.info(message.toString());
     }
     
     public static void EXIT(Game game) 
     {
-        closeInputReader();
         if (game == null) {
             ERROR("NO GAME FOUND");
         } else {
-            outputStream.println("Game found: " + game.getName() + "   Link to download ->" + game.getURL());
+            log.info("Game found: " + game.getName() + "   Link to download ->" + game.getURL());
         }
     }
 
     public static void EXIT(String message) 
     {
-        closeInputReader();
-        outputStream.println("ERROR " + message);
-    }
-
-    // closes scanner to prevent leaks
-    public static void closeInputReader () 
-    {
-        inputScanner.close();
+        ERROR("ERROR " + message);
     }
 }
