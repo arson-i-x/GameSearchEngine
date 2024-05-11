@@ -2,15 +2,16 @@
 
 <?import javafx.scene.Cursor?>
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.TextArea?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.effect.InnerShadow?>
 <?import javafx.scene.layout.Pane?>
 <?import javafx.scene.paint.Color?>
 <?import javafx.scene.text.Font?>
 
-<Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="158.0" prefWidth="911.0" style="-fx-background-color: #1b2838;" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="UI.SearchWindow">
+<Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="494.0" prefWidth="911.0" style="-fx-background-color: #1b2838;" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="UI.SearchWindow">
    <children>
-      <TextField fx:id="query" focusTraversable="false" layoutX="14.0" layoutY="14.0" minWidth="0.0" nodeOrientation="LEFT_TO_RIGHT" onAction="#query" prefHeight="31.0" prefWidth="797.0" promptText="Enter name of a game to search" style="-fx-background-color: #1b2838; -fx-text-fill: #ffffff;">
+      <TextField fx:id="query" focusTraversable="false" layoutX="6.0" layoutY="36.0" minWidth="0.0" nodeOrientation="LEFT_TO_RIGHT" onAction="#query" prefHeight="31.0" prefWidth="805.0" promptText="Enter name of a game to search" style="-fx-background-color: #1b2838; -fx-text-fill: #ffffff;">
          <cursor>
             <Cursor fx:constant="TEXT" />
          </cursor>
@@ -21,7 +22,7 @@
                </color>
             </InnerShadow>
          </effect></TextField>
-      <Button fx:id="search" layoutX="128.0" layoutY="61.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#search" opacity="0.85" prefHeight="83.0" prefWidth="769.0" style="-fx-background-color: #1b2838;" text="SEARCH" textFill="WHITE">
+      <Button fx:id="search" layoutX="130.0" layoutY="377.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#search" opacity="0.85" prefHeight="103.0" prefWidth="775.0" style="-fx-background-color: #1b2838;" text="SEARCH" textFill="WHITE">
          <font>
             <Font name="Segoe UI" size="37.0" />
          </font>
@@ -36,7 +37,7 @@
             </InnerShadow>
          </effect>
       </Button>
-      <Button fx:id="back" layoutX="14.0" layoutY="61.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#backButton" opacity="0.85" prefHeight="83.0" prefWidth="110.0" style="-fx-background-color: #1b2838;" text="&lt;&lt;&lt;" textFill="WHITE">
+      <Button fx:id="back" layoutX="7.0" layoutY="377.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#backButton" opacity="0.85" prefHeight="103.0" prefWidth="116.0" style="-fx-background-color: #1b2838;" text="&lt;&lt;&lt;" textFill="WHITE">
          <font>
             <Font name="Segoe UI Bold Italic" size="29.0" />
          </font>
@@ -51,7 +52,7 @@
             </InnerShadow>
          </effect>
       </Button>
-      <Button fx:id="enter" layoutX="817.0" layoutY="14.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#query" opacity="0.85" prefHeight="31.0" prefWidth="67.0" style="-fx-background-color: #1b2838;" text="ENTER" textFill="WHITE">
+      <Button fx:id="enter" layoutX="817.0" layoutY="36.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#query" opacity="0.85" prefHeight="31.0" prefWidth="86.0" style="-fx-background-color: #1b2838;" text="ENTER" textFill="WHITE">
          <font>
             <Font name="Segoe UI Bold Italic" size="13.0" />
          </font>
@@ -73,13 +74,18 @@
          <cursor>
             <Cursor fx:constant="HAND" />
          </cursor>
-         <effect>
-            <InnerShadow blurType="GAUSSIAN">
-               <color>
-                  <Color red="0.2763157784938812" green="0.2763157784938812" blue="0.2763157784938812" />
-               </color>
-            </InnerShadow>
-         </effect>
       </Button>
+      <TextField fx:id="title" disable="true" editable="false" layoutX="6.0" layoutY="2.0" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="25.0" prefWidth="200.0" style="-fx-background-color: #1b2838; -fx-text-fill: #ffffff;" text="DATABASE SEARCH">
+         <font>
+            <Font name="Calibri" size="15.0" />
+         </font>
+         <cursor>
+            <Cursor fx:constant="TEXT" />
+         </cursor>
+      </TextField>
+      <TextArea fx:id="gameList" editable="false" layoutX="6.0" layoutY="73.0" prefHeight="296.0" prefWidth="899.0" stylesheets="@background.css" text="&#10;" />
    </children>
+   <cursor>
+      <Cursor fx:constant="MOVE" />
+   </cursor>
 </Pane>

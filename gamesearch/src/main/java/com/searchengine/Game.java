@@ -113,7 +113,7 @@ public class Game {
         return removed;
     }
     
-    public long getGameID () 
+    public Long getGameID () 
     {
         return gameID;
     }

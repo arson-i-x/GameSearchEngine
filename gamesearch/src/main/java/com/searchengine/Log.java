@@ -1,7 +1,6 @@
 package com.searchengine;
 
 import org.apache.logging.log4j.*;
-import org.apache.logging.log4j.core.appender.FileAppender;
 import org.apache.logging.log4j.core.config.Configurator;
 
 public class Log 

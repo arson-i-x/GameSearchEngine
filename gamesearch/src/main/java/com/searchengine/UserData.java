@@ -183,7 +183,7 @@ public class UserData implements Serializable {
         return removedGames;
     }
  
-    private static void writeUserDataToFile(UserData data) 
+    public static void writeUserDataToFile(UserData data) 
     {
         try {
             userdataFile.createNewFile();
@@ -229,12 +229,12 @@ public class UserData implements Serializable {
         userdataFile.delete();
     }
 
-    private void putHours(Game game, Long hours) 
+    public void putHours(Game game, Long hours) 
     {
         userGames.put(game.getGameID(), hours);
     }
 
-    private long getHours(long id) 
+    public long getHours(long id) 
     {
         return userGames.get(id);
     }

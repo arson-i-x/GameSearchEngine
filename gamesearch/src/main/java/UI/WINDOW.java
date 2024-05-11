@@ -29,4 +29,16 @@ public class WINDOW {
             throw new RuntimeException(exception);
         }
     }
+    
+    @FXML
+    public void maximize() 
+    {
+        SearchApp.changeWindowSize();
+    }
+
+    @FXML
+    public void minimize() 
+    {
+        SearchApp.minimize();
+    }
 }

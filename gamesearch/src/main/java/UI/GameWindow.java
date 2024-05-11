@@ -6,13 +6,10 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.ResourceBundle;
 import java.util.concurrent.TimeUnit;
-
 import javax.swing.JOptionPane;
-
 import com.searchengine.Database;
 import com.searchengine.Game;
 import com.searchengine.Log;
-
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -24,12 +21,10 @@ import javafx.scene.web.WebView;
 public class GameWindow extends WINDOW implements Initializable {
     
     // stores all games returned
-    private static List<Long> gameList;
-    private static int currIndex = -1;
-
-    // instance variables
+    private static List<Game> gameList;
+    private static Integer currIndex;
     private WebEngine engine;
-    private Game game;
+    private Game currGame;
 
     @FXML
     private WebView view;
@@ -45,12 +40,6 @@ public class GameWindow extends WINDOW implements Initializable {
     public GameWindow() 
     {
         open("GameWindow.fxml");
-    }
-
-    @FXML
-    public void maximize() 
-    {
-        SearchApp.changeWindowSize();
     }
 
     @FXML
@@ -72,30 +61,32 @@ public class GameWindow extends WINDOW implements Initializable {
     @FXML
     public void nextButton() 
     {
-        if (currIndex == gameList.size()-1 || currIndex == -1) {
-            return;
+        if (currIndex == null) {
+            currIndex = gameList.size()-1;
         }
-
-        game = Database.getGame(gameList.get(++currIndex).toString());
-        String lastURL = game.getURL();
-        engine.load(lastURL);
-        URL.setText(lastURL);
+        currIndex++;
+        try {
+            currGame = gameList.get(currIndex);
+            engine.load(currGame.getURL());
+        } catch (IndexOutOfBoundsException e) {
+            currIndex = -1;
+            nextButton();
+        }
     }
 
     @FXML
     public void backButton() 
     {
-        if (currIndex == -1) {
+        if (currIndex == null) {
             currIndex = gameList.size()-1;
         }
-
+        currIndex--;
         try {
-            game = Database.getGame(gameList.get(--currIndex).toString());
-            String lastURL = game.getURL();
-            engine.load(lastURL);
-            URL.setText(lastURL);
+            currGame = gameList.get(currIndex);
+            engine.load(currGame.getURL());
         } catch (IndexOutOfBoundsException e) {
-            returnToSearch();
+            currIndex = gameList.size();
+            backButton();
         }
     }
 
@@ -109,7 +100,7 @@ public class GameWindow extends WINDOW implements Initializable {
     @FXML
     public void onLike() 
     {
-        SearchApp.like(game);
+        SearchApp.like(currGame);
         onNext();
     }
 
@@ -120,23 +111,19 @@ public class GameWindow extends WINDOW implements Initializable {
         long startTime = 0, stoptime = 0;
         try {
             startTime = System.nanoTime();
-            game = SearchApp.getNextGame();
+            currGame = SearchApp.getNextGame();
             stoptime = System.nanoTime();
         } catch (NoSuchElementException e) {
             Log.MESSAGE("NO GAME FOUND"+e.getMessage());
             JOptionPane.showMessageDialog(null, "NO MORE GAMES IN DATABASE");
             exit();
         }
-
-        Log.MESSAGE(game.getName() + " is your game.");
+        engine.load(currGame.getURL());
         Long timecalc = stoptime - startTime;
         time.setText("Time taken: " + Long.valueOf(TimeUnit.NANOSECONDS.toMillis(timecalc)).toString() + "ms");
-        engine = view.getEngine();
-        URL.setText(game.getURL());
-        gameList.add(game.getGameID());
+        gameList.add(currGame);
         currIndex = gameList.size()-1;
         view.setVisible(true);
-        engine.load(URL.getText());
     }
 
     @FXML
@@ -153,9 +140,15 @@ public class GameWindow extends WINDOW implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle bundle) {
+        engine = view.getEngine();
+        URL.textProperty().bind(engine.locationProperty());
         view.setVisible(false);
-        gameList = new ArrayList<Long>(SearchApp.getSearchInstance()  // Gets userdata games 
-                .getUserData().getGames().keySet().stream().toList());// in order for browser
+        gameList = new ArrayList<>();
+        List<Long> idlist = SearchApp.getSearchInstance()  // Gets userdata games 
+                .getUserData().getGames().keySet().stream().toList();// in order for browser
+        for (Long id : idlist) {
+            gameList.add(Database.getGame(id.toString()));
+        }
         onNext();
     }
 }

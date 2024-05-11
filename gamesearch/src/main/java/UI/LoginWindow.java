@@ -31,7 +31,6 @@ public class LoginWindow extends WINDOW {
     public void search() 
     {
         SearchApp.display(new GameWindow());
-        SearchApp.changeWindowSize();
     }
 
     @FXML

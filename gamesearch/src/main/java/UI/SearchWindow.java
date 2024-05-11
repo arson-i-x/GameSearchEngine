@@ -7,17 +7,23 @@ import javax.swing.JOptionPane;
 import com.searchengine.Database;
 import com.searchengine.Game;
 import com.searchengine.Log;
-
+import com.searchengine.UserData;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import org.controlsfx.control.textfield.TextFields;
 
 public class SearchWindow extends WINDOW implements Initializable {
 
+    private static final String header = "LIBRARY:" + "\n";
+
     @FXML
     TextField query;
+
+    @FXML
+    TextArea gameList;
 
     static Game search;
 
@@ -42,8 +48,8 @@ public class SearchWindow extends WINDOW implements Initializable {
         }
         try {
             SearchApp.addGame(input);
+            updateGames();
             query.clear();
-            JOptionPane.showMessageDialog(null, input + " added to library");
         } catch (RuntimeException n) {
             Log.ERROR("GAME NOT FOUND");
             JOptionPane.showMessageDialog(null, "GAME NOT FOUND");
@@ -54,7 +60,6 @@ public class SearchWindow extends WINDOW implements Initializable {
     public void search()
     {
         SearchApp.display(new GameWindow());
-        SearchApp.changeWindowSize();
     }
 
     @FXML
@@ -67,5 +72,28 @@ public class SearchWindow extends WINDOW implements Initializable {
     public void initialize(URL location, ResourceBundle resources) {
         Set<String> gameNames = Database.getAllNames();
         TextFields.bindAutoCompletion(query, gameNames);
+        updateGames();
+    }
+
+    private void updateGames() // prints game list to window
+    {
+        UserData data = SearchApp.getSearchInstance().getUserData();
+        gameList.clear();
+        gameList.appendText(header);
+        StringBuilder sb = new StringBuilder();
+        for (Long id : data.getGames().keySet()) 
+        {
+            String name = Database.getGame(id.toString()).getName();
+            Long hours = data.getHours(id);
+            if (hours != 0) {
+                sb.append(name+"   ");
+                if(hours != 1000000000 && hours != -1000000000) {
+                    sb.append(Math.abs(data.getHours(id))+ " Hours Played");
+                }
+                sb.append("\n");
+            }
+            
+        }
+        gameList.appendText(sb.toString());
     }
 }

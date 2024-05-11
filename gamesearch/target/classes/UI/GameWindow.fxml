@@ -7,12 +7,14 @@
 <?import javafx.scene.effect.Blend?>
 <?import javafx.scene.effect.DropShadow?>
 <?import javafx.scene.effect.InnerShadow?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.paint.Color?>
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.web.WebView?>
 
-<AnchorPane prefHeight="720.0" prefWidth="1280.0" style="-fx-background-color: #1b2838; -fx-border-radius: 5em;" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="UI.GameWindow">
+<AnchorPane prefHeight="794.0" prefWidth="1289.0" style="-fx-background-color: #1b2838; -fx-border-radius: 5em;" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="UI.GameWindow">
    <children>
       <WebView fx:id="view" layoutY="70.0" prefHeight="606.0" prefWidth="1289.0" style="fx-background-color: #1b2838;" AnchorPane.bottomAnchor="44.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="70.0" />
       <Button fx:id="DeleteData" layoutX="1.0" layoutY="694.0" maxHeight="-Infinity" maxWidth="-Infinity" mnemonicParsing="false" onAction="#deleteLibraryData" prefHeight="39.0" prefWidth="147.0" style="-fx-background-color: #1b2838;" text="DELETE ALL USER DATA" textFill="#c2c2c2" AnchorPane.bottomAnchor="1.0">
@@ -40,7 +42,7 @@
       </Button>
       <TextField fx:id="URL" layoutX="77.0" layoutY="32.0" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" onAction="#onEnter" prefHeight="39.0" prefWidth="1135.0" style="-fx-background-color: #1b2838; -fx-text-fill: #ffffff;" text="STEAM GAME SEARCH" AnchorPane.leftAnchor="77.0" AnchorPane.rightAnchor="77.0" AnchorPane.topAnchor="32.0">
          <font>
-            <Font name="Calibri" size="24.0" />
+            <Font name="Calibri Italic" size="19.0" />
          </font>
          <cursor>
             <Cursor fx:constant="TEXT" />
@@ -80,9 +82,9 @@
             <Font size="17.0" />
          </font></Button>
       <Label fx:id="time" layoutX="1008.0" layoutY="39.0" prefHeight="25.0" prefWidth="122.0" textFill="WHITE" AnchorPane.rightAnchor="78.0" AnchorPane.topAnchor="39.0" />
-      <Button fx:id="likeButton" layoutX="1116.0" layoutY="247.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#onLike" opacity="0.85" prefHeight="134.0" prefWidth="147.0" style="-fx-background-color: #1b2838;" text="LIKE" textFill="WHITE" AnchorPane.rightAnchor="26.0">
+      <Button fx:id="likeButton" layoutX="1116.0" layoutY="296.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#onLike" opacity="0.85" prefHeight="134.0" prefWidth="147.0" style="-fx-background-color: #1b2838;" text="LIKE" textFill="WHITE" AnchorPane.rightAnchor="26.0">
          <font>
-            <Font name="Segoe UI Bold Italic" size="22.0" />
+            <Font name="Segoe UI Bold" size="22.0" />
          </font>
          <cursor>
             <Cursor fx:constant="HAND" />
@@ -95,7 +97,7 @@
             </InnerShadow>
          </effect>
       </Button>
-      <Button fx:id="nextButton" layoutX="1116.0" layoutY="381.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#onNext" opacity="0.86" prefHeight="134.0" prefWidth="147.0" style="-fx-background-color: #1b2838;" text="NEXT" textFill="WHITE" AnchorPane.rightAnchor="26.0">
+      <Button fx:id="nextButton" layoutX="1116.0" layoutY="424.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#onNext" opacity="0.86" prefHeight="134.0" prefWidth="147.0" style="-fx-background-color: #1b2838;" text="NEXT" textFill="WHITE" AnchorPane.rightAnchor="26.0">
          <font>
             <Font name="Segoe UI Bold Italic" size="22.0" />
          </font>
@@ -110,7 +112,7 @@
             </InnerShadow>
          </effect>
       </Button>
-      <Button fx:id="search" layoutX="14.0" layoutY="314.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#returnToSearch" opacity="0.85" prefHeight="134.0" prefWidth="147.0" style="-fx-background-color: #1b2838;" text="BACK" textFill="WHITE" AnchorPane.leftAnchor="14.0">
+      <Button fx:id="search" layoutX="14.0" layoutY="363.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#returnToSearch" opacity="0.85" prefHeight="134.0" prefWidth="147.0" style="-fx-background-color: #1b2838;" text="BACK" textFill="WHITE" AnchorPane.leftAnchor="14.0">
          <font>
             <Font name="Segoe UI Bold Italic" size="22.0" />
          </font>
@@ -125,9 +127,9 @@
             </InnerShadow>
          </effect>
       </Button>
-      <Button fx:id="max" layoutX="1234.0" layoutY="2.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#maximize" opacity="0.85" prefHeight="25.0" prefWidth="27.0" style="-fx-background-color: #1b2838;" text="O" textFill="WHITE" AnchorPane.rightAnchor="21.0" AnchorPane.topAnchor="2.0">
+      <Button fx:id="max" layoutX="1226.0" layoutY="2.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#maximize" opacity="0.85" prefHeight="25.0" prefWidth="27.0" style="-fx-background-color: #1b2838;" text="O" textFill="WHITE" AnchorPane.rightAnchor="36.0" AnchorPane.topAnchor="2.0">
          <font>
-            <Font name="Segoe UI Bold Italic" size="11.0" />
+            <Font name="Segoe UI" size="12.0" />
          </font>
          <cursor>
             <Cursor fx:constant="HAND" />
@@ -140,7 +142,7 @@
             </InnerShadow>
          </effect>
       </Button>
-      <TextField fx:id="title" editable="false" layoutX="1.0" layoutY="2.0" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="25.0" prefWidth="107.0" style="-fx-background-color: #1b2838; -fx-text-fill: #ffffff;" text="GAME SEARCH" AnchorPane.topAnchor="2.0">
+      <TextField fx:id="title" disable="true" editable="false" layoutX="39.0" layoutY="2.0" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="25.0" prefWidth="161.0" style="-fx-background-color: #1b2838; -fx-text-fill: #ffffff;" text="GAME SEARCH" AnchorPane.topAnchor="2.0">
          <font>
             <Font name="Calibri" size="15.0" />
          </font>
@@ -148,6 +150,19 @@
             <Cursor fx:constant="TEXT" />
          </cursor>
       </TextField>
+      <Button fx:id="min" layoutX="1189.0" layoutY="2.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#minimize" opacity="0.85" prefHeight="25.0" prefWidth="27.0" style="-fx-background-color: #1b2838;" text="C" textFill="WHITE" AnchorPane.rightAnchor="73.0" AnchorPane.topAnchor="2.0">
+         <font>
+            <Font name="Segoe UI" size="12.0" />
+         </font>
+         <cursor>
+            <Cursor fx:constant="HAND" />
+         </cursor>
+      </Button>
+      <ImageView fitHeight="25.0" fitWidth="27.0" layoutX="12.0" layoutY="2.0">
+         <image>
+            <Image url="@icon.png" />
+         </image>
+      </ImageView>
    </children>
    <effect>
       <Blend />

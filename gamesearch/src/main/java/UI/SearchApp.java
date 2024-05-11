@@ -1,11 +1,8 @@
 package UI;
 
 import java.io.IOException;
-import java.util.List;
 import java.util.NoSuchElementException;
-
 import javax.swing.JOptionPane;
-
 import com.lukaspradel.steamapi.core.exception.SteamApiException;
 import com.searchengine.*;
 import javafx.application.Application;
@@ -14,6 +11,7 @@ import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.image.Image;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
@@ -32,12 +30,14 @@ public class SearchApp extends Application
         searchInstance = new GameSearch();
         if (!searchInstance.getUserData().isEmpty()) {
             root = new GameWindow().getRoot();
-            noResize = false;
         } else {
             root = new MainWindow().getRoot();
-            noResize = true;
         }
     }
+
+    public static void minimize() 
+    {
+        stage.setIconified(true);    }
 
     public static void changeWindowSize() 
     {
@@ -146,11 +146,7 @@ public class SearchApp extends Application
         stage.initStyle(StageStyle.UNDECORATED);
         stage.setScene(new Scene(root)); 
         stage.show();
-   
+        stage.getIcons().add(new Image(SearchApp.class.getResourceAsStream("icon.png")));
         SearchApp.makeDraggable();
-
-        if (!noResize) {
-            stage.setFullScreen(true);
-        }
     }
 }

@@ -10,13 +10,13 @@
 <?import javafx.scene.paint.Color?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane prefHeight="470.0" prefWidth="610.0" style="-fx-background-color: #1b2838;" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="UI.LoginWindow">
+<AnchorPane prefHeight="353.0" prefWidth="822.0" style="-fx-background-color: #1b2838;" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="UI.LoginWindow">
    <children>
-      <ImageView fx:id="image" fitHeight="538.0" fitWidth="889.0" layoutY="54.0" pickOnBounds="true" preserveRatio="true">
+      <ImageView fx:id="image" fitHeight="370.0" fitWidth="818.0" layoutX="4.0" layoutY="66.0" pickOnBounds="true" preserveRatio="true" AnchorPane.bottomAnchor="0.90625" AnchorPane.leftAnchor="4.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="66.0">
          <image>
             <Image url="@helpimage.gif" />
          </image></ImageView>
-      <TextField fx:id="steamIDInput" focusTraversable="false" layoutX="4.0" layoutY="4.0" minWidth="0.0" nodeOrientation="LEFT_TO_RIGHT" onAction="#onLogin" opacity="0.63" prefHeight="31.0" prefWidth="780.0" promptText="Enter Your Steam ID" style="-fx-background-color: #1b2838; -fx-text-fill: #ffffff;">
+      <TextField fx:id="steamIDInput" focusTraversable="false" layoutX="4.0" layoutY="30.0" minWidth="0.0" nodeOrientation="LEFT_TO_RIGHT" onAction="#onLogin" opacity="0.63" prefHeight="31.0" prefWidth="718.0" promptText="Enter Your Steam ID" style="-fx-background-color: #1b2838; -fx-text-fill: #ffffff;" AnchorPane.leftAnchor="4.0" AnchorPane.topAnchor="30.0">
          <cursor>
             <Cursor fx:constant="TEXT" />
          </cursor>
@@ -28,7 +28,7 @@
             </InnerShadow>
          </effect>
       </TextField>
-      <Button fx:id="submit" layoutX="787.0" layoutY="4.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#onLogin" opacity="0.85" prefHeight="31.0" prefWidth="75.0" style="-fx-background-color: #1b2838;" text="ENTER" textFill="WHITE">
+      <Button fx:id="submit" layoutX="786.0" layoutY="30.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#onLogin" opacity="0.85" prefHeight="31.0" prefWidth="77.0" style="-fx-background-color: #1b2838;" text="SUBMIT" textFill="WHITE" AnchorPane.rightAnchor="6.0" AnchorPane.topAnchor="30.0">
          <font>
             <Font name="Segoe UI Bold" size="11.0" />
          </font>
@@ -43,7 +43,7 @@
             </InnerShadow>
          </effect>
       </Button>
-      <Button fx:id="back" layoutX="4.0" layoutY="36.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#backButton" opacity="0.85" prefHeight="19.0" prefWidth="101.0" style="-fx-background-color: #1b2838;" text="&lt;&lt;&lt;" textFill="WHITE">
+      <Button fx:id="back" layoutX="14.0" layoutY="368.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#backButton" opacity="0.85" prefHeight="31.0" prefWidth="101.0" style="-fx-background-color: #1b2838;" text="&lt;&lt;&lt;" textFill="WHITE" AnchorPane.bottomAnchor="13.09375" AnchorPane.leftAnchor="14.0">
          <font>
             <Font name="Segoe UI Bold" size="11.0" />
          </font>
@@ -58,7 +58,7 @@
             </InnerShadow>
          </effect>
       </Button>
-      <Button fx:id="skip" layoutX="787.0" layoutY="36.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#search" opacity="0.85" prefHeight="19.0" prefWidth="101.0" style="-fx-background-color: #1b2838;" text="&gt;&gt;&gt;" textFill="WHITE">
+      <Button fx:id="skip" layoutX="707.0" layoutY="368.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#search" opacity="0.85" prefHeight="31.0" prefWidth="101.0" style="-fx-background-color: #1b2838;" text="SKIP" textFill="WHITE" AnchorPane.bottomAnchor="13.09375" AnchorPane.rightAnchor="14.0">
          <font>
             <Font name="Segoe UI Bold" size="11.0" />
          </font>
@@ -73,20 +73,21 @@
             </InnerShadow>
          </effect>
       </Button>
-      <Button fx:id="exit" layoutX="863.0" layoutY="4.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#exit" opacity="0.85" prefHeight="31.0" prefWidth="26.0" style="-fx-background-color: #1b2838;" text="X" textFill="WHITE">
+      <Button fx:id="exit" layoutX="866.0" layoutY="-1.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#exit" opacity="0.85" prefHeight="25.0" prefWidth="26.0" style="-fx-background-color: #1b2838;" text="X" textFill="WHITE" AnchorPane.rightAnchor="1.0" AnchorPane.topAnchor="-1.0">
          <font>
             <Font name="Segoe UI Bold Italic" size="11.0" />
          </font>
          <cursor>
             <Cursor fx:constant="HAND" />
          </cursor>
-         <effect>
-            <InnerShadow blurType="GAUSSIAN" height="15.14" radius="6.3375" width="12.21">
-               <color>
-                  <Color red="1.0" green="1.0" blue="1.0" />
-               </color>
-            </InnerShadow>
-         </effect>
       </Button>
+      <TextField fx:id="title" disable="true" editable="false" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="23.0" prefWidth="163.0" style="-fx-background-color: #1b2838; -fx-text-fill: #ffffff;" text="LOGIN" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="0.0">
+         <font>
+            <Font name="Calibri" size="15.0" />
+         </font>
+         <cursor>
+            <Cursor fx:constant="TEXT" />
+         </cursor>
+      </TextField>
    </children>
 </AnchorPane>
