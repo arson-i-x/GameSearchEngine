@@ -42,7 +42,7 @@
       </Button>
       <TextField fx:id="URL" layoutX="77.0" layoutY="32.0" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" onAction="#onEnter" prefHeight="39.0" prefWidth="1135.0" style="-fx-background-color: #1b2838; -fx-text-fill: #ffffff;" text="STEAM GAME SEARCH" AnchorPane.leftAnchor="77.0" AnchorPane.rightAnchor="77.0" AnchorPane.topAnchor="32.0">
          <font>
-            <Font name="Calibri Italic" size="19.0" />
+            <Font name="Calibri" size="16.0" />
          </font>
          <cursor>
             <Cursor fx:constant="TEXT" />
@@ -82,7 +82,7 @@
             <Font size="17.0" />
          </font></Button>
       <Label fx:id="time" layoutX="1008.0" layoutY="39.0" prefHeight="25.0" prefWidth="122.0" textFill="WHITE" AnchorPane.rightAnchor="78.0" AnchorPane.topAnchor="39.0" />
-      <Button fx:id="likeButton" layoutX="1116.0" layoutY="296.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#onLike" opacity="0.85" prefHeight="134.0" prefWidth="147.0" style="-fx-background-color: #1b2838;" text="LIKE" textFill="WHITE" AnchorPane.rightAnchor="26.0">
+      <Button fx:id="likeButton" layoutX="1116.0" layoutY="357.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#onLike" opacity="0.85" prefHeight="54.0" prefWidth="147.0" style="-fx-background-color: #1b2838;" text="LIKE" textFill="WHITE" AnchorPane.rightAnchor="26.0">
          <font>
             <Font name="Segoe UI Bold" size="22.0" />
          </font>
@@ -97,9 +97,9 @@
             </InnerShadow>
          </effect>
       </Button>
-      <Button fx:id="nextButton" layoutX="1116.0" layoutY="424.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#onNext" opacity="0.86" prefHeight="134.0" prefWidth="147.0" style="-fx-background-color: #1b2838;" text="NEXT" textFill="WHITE" AnchorPane.rightAnchor="26.0">
+      <Button fx:id="nextButton" layoutX="1116.0" layoutY="410.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#onNext" opacity="0.86" prefHeight="54.0" prefWidth="147.0" style="-fx-background-color: #1b2838;" text="NEXT" textFill="WHITE" AnchorPane.rightAnchor="26.0">
          <font>
-            <Font name="Segoe UI Bold Italic" size="22.0" />
+            <Font name="Segoe UI Bold" size="22.0" />
          </font>
          <cursor>
             <Cursor fx:constant="HAND" />
@@ -112,9 +112,9 @@
             </InnerShadow>
          </effect>
       </Button>
-      <Button fx:id="search" layoutX="14.0" layoutY="363.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#returnToSearch" opacity="0.85" prefHeight="134.0" prefWidth="147.0" style="-fx-background-color: #1b2838;" text="BACK" textFill="WHITE" AnchorPane.leftAnchor="14.0">
+      <Button fx:id="search" layoutX="14.0" layoutY="391.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#returnToSearch" opacity="0.85" prefHeight="39.0" prefWidth="100.0" style="-fx-background-color: #1b2838;" text="SEARCH" textFill="WHITE" AnchorPane.leftAnchor="14.0">
          <font>
-            <Font name="Segoe UI Bold Italic" size="22.0" />
+            <Font name="Segoe UI Bold Italic" size="17.0" />
          </font>
          <cursor>
             <Cursor fx:constant="HAND" />

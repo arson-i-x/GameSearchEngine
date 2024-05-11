@@ -17,8 +17,6 @@ import org.controlsfx.control.textfield.TextFields;
 
 public class SearchWindow extends WINDOW implements Initializable {
 
-    private static final String header = "LIBRARY:" + "\n";
-
     @FXML
     TextField query;
 
@@ -79,7 +77,6 @@ public class SearchWindow extends WINDOW implements Initializable {
     {
         UserData data = SearchApp.getSearchInstance().getUserData();
         gameList.clear();
-        gameList.appendText(header);
         StringBuilder sb = new StringBuilder();
         for (Long id : data.getGames().keySet()) 
         {

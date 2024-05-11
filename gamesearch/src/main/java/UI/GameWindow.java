@@ -35,7 +35,7 @@ public class GameWindow extends WINDOW implements Initializable {
     @FXML
     private Label time;
 
-    private static final String defaultpage = "google.com";
+    private static final String defaultpage = "https://google.com";
 
     public GameWindow() 
     {

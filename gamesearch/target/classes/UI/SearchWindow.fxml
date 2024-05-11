@@ -22,9 +22,9 @@
                </color>
             </InnerShadow>
          </effect></TextField>
-      <Button fx:id="search" layoutX="130.0" layoutY="377.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#search" opacity="0.85" prefHeight="103.0" prefWidth="775.0" style="-fx-background-color: #1b2838;" text="SEARCH" textFill="WHITE">
+      <Button fx:id="search" layoutX="150.0" layoutY="417.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#search" opacity="0.85" prefHeight="63.0" prefWidth="755.0" style="-fx-background-color: #1b2838;" text="DONE" textFill="WHITE">
          <font>
-            <Font name="Segoe UI" size="37.0" />
+            <Font name="Segoe UI Bold" size="37.0" />
          </font>
          <cursor>
             <Cursor fx:constant="HAND" />
@@ -37,7 +37,7 @@
             </InnerShadow>
          </effect>
       </Button>
-      <Button fx:id="back" layoutX="7.0" layoutY="377.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#backButton" opacity="0.85" prefHeight="103.0" prefWidth="116.0" style="-fx-background-color: #1b2838;" text="&lt;&lt;&lt;" textFill="WHITE">
+      <Button fx:id="back" layoutX="6.0" layoutY="417.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#backButton" opacity="0.85" prefHeight="63.0" prefWidth="140.0" style="-fx-background-color: #1b2838;" text="&lt;&lt;&lt;" textFill="WHITE">
          <font>
             <Font name="Segoe UI Bold Italic" size="29.0" />
          </font>
@@ -52,7 +52,7 @@
             </InnerShadow>
          </effect>
       </Button>
-      <Button fx:id="enter" layoutX="817.0" layoutY="36.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#query" opacity="0.85" prefHeight="31.0" prefWidth="86.0" style="-fx-background-color: #1b2838;" text="ENTER" textFill="WHITE">
+      <Button fx:id="enter" layoutX="817.0" layoutY="36.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#query" opacity="0.85" prefHeight="31.0" prefWidth="86.0" style="-fx-background-color: #1b2838;" text="ADD" textFill="WHITE">
          <font>
             <Font name="Segoe UI Bold Italic" size="13.0" />
          </font>
@@ -83,7 +83,10 @@
             <Cursor fx:constant="TEXT" />
          </cursor>
       </TextField>
-      <TextArea fx:id="gameList" editable="false" layoutX="6.0" layoutY="73.0" prefHeight="296.0" prefWidth="899.0" stylesheets="@background.css" text="&#10;" />
+      <TextArea fx:id="gameList" editable="false" layoutX="6.0" layoutY="73.0" prefHeight="341.0" prefWidth="899.0" promptText="(ADDED GAMES WILL APPEAR HERE)" stylesheets="@background.css">
+         <font>
+            <Font size="19.0" />
+         </font></TextArea>
    </children>
    <cursor>
       <Cursor fx:constant="MOVE" />
